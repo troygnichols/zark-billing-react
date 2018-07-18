@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
-import EditInvoice from './EditInvoice';
+import InvoiceList from './InvoiceList';
 
 class App extends Component {
   render() {
-    const invoice = {};
-
     return (
       <div className="App">
-        <EditInvoice invoice={invoice} />
+        <InvoiceList />
       </div>
     );
   }
