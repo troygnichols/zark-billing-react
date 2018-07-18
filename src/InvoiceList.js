@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 
+import { Link } from 'react-router-dom';
+
 class InvoiceList extends Component {
   constructor() {
     super();
@@ -10,12 +12,11 @@ class InvoiceList extends Component {
   }
 
   componentDidMount() {
-    const self = this;
     fetch('http://localhost:4000/invoices')
       .then(resp => resp.json())
       .then((data) => {
         this.setState({
-          invoices: self.buildInvoices(data)
+          invoices: this.buildInvoices(data)
         });
       });
   }
@@ -33,7 +34,9 @@ class InvoiceList extends Component {
           <td>{invoice.subject}</td>
           <td>{invoice.notes}</td>
           <td>{paid}</td>
-          <td></td>
+          <td>
+            <Link to={`/invoices/${invoice.id}`}>View</Link>
+          </td>
         </tr>
       );
     });
@@ -41,26 +44,25 @@ class InvoiceList extends Component {
 
   render() {
     return (
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Invoice ID</th>
-              <th>Your Business</th>
-              <th>Client</th>
-              <th>Issued</th>
-              <th>Due</th>
-              <th>Subject</th>
-              <th>Notes</th>
-              <th>Paid?</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.invoices}
-          </tbody>
-        </table>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Invoice ID</th>
+            <th>Your Business</th>
+            <th>Client</th>
+            <th>Issued</th>
+            <th>Due</th>
+            <th>Subject</th>
+            <th>Notes</th>
+            <th>Paid?</th>
+            <th>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.state.invoices}
+        </tbody>
+      </table>
     );
   }
 }

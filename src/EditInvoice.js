@@ -1,22 +1,24 @@
 import React, { Component } from 'react';
+import { withRouter, Link } from 'react-router-dom';
 
 class EditInvoice extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      entityName: '',
-      clientName: '',
-      invoiceId: '',
-      dueDate: '',
-      issueDate: '',
-      paidDate: '',
-      subjectText: '',
-      lineItems: {
-        2: {description: 'foobar', quantity: 2, unitPrice: 100},
-        1: {description: 'barz', quantity: 3, unitPrice: 75},
-      },
-      ...props.invoice
+      invoice: {
+        entity_name: '',
+        client_name: '',
+        invoice_id: '',
+        due_date: '',
+        issue_date: '',
+        paid_at: '',
+        subject: '',
+        items: {
+          // 2: {description: 'foobar', quantity: 2, unit_price: 100},
+          // 1: {description: 'barz', quantity: 3, unit_price: 75},
+        }
+      }
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -24,20 +26,31 @@ class EditInvoice extends Component {
     this.handleDeleteLineItem = this.handleDeleteLineItem.bind(this);
   }
 
+  componentDidMount() {
+    const id = this.props.match.params.id;
+    fetch(`http://localhost:4000/invoices/${id}`)
+      .then(resp => resp.json())
+      .then((data) => {
+        this.setState({
+          invoice: data.invoice
+        });
+      });
+  }
+
   handleChange(event) {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value
     const name = target.name;
 
-    if (name.startsWith('lineItems')) {
+    if (name.startsWith('items')) {
       const [, fieldName, index] = name.split('.');
       this.setState((prevState) => {
         return {
           ...prevState,
-          lineItems: {
-            ...prevState.lineItems,
+          items: {
+            ...prevState.invoice.items,
             [index]: {
-              ...prevState.lineItems[index],
+              ...prevState.invoice.items[index],
               [fieldName]: value
             }
           }
@@ -53,16 +66,19 @@ class EditInvoice extends Component {
     const keyToDel = event.target.getAttribute('data-key');
     const self = this;
     this.setState((prevState) => {
-      const newLineItems = {};
-      const keys = self.getOrderedKeys(prevState.lineItems);
+      const newItems = {};
+      const keys = self.getOrderedKeys(prevState.invoice.items);
       keys.forEach((key, index) => {
         if (key !== parseInt(keyToDel, 10)) {
-          newLineItems[Object.keys(newLineItems).length] = prevState.lineItems[key];
+          newItems[Object.keys(newItems).length] = prevState.invoice.items[key];
         }
       });
       return {
         ...prevState,
-        lineItems: newLineItems
+        invoice: {
+          ...prevState.invoice,
+          items: newItems
+        }
       };
     });
   }
@@ -70,13 +86,17 @@ class EditInvoice extends Component {
   handleAddLineItem(event) {
     event.preventDefault();
     this.setState((prevState) => {
+      const newKey = this.getNextLineItemKey(prevState.invoice.items);
       return {
         ...prevState,
-        lineItems: {
-          [this.getNextLineItemKey(prevState.lineItems)]: {
-            description: '', quantity: '', unitPrice: 0
-          },
-          ...prevState.lineItems
+        invoice: {
+          ...prevState.invoice,
+          items: {
+            [newKey]: {
+              description: '', quantity: '', unit_price: 0
+            },
+            ...prevState.invoice.items
+          }
         }
       }
     });
@@ -87,14 +107,14 @@ class EditInvoice extends Component {
     console.log('saving state', this.state);
   }
 
-  getNextLineItemKey(lineItems) {
-    const keys = Object.keys(lineItems);
-    const highestKey = keys.sort()[keys.length-1];
+  getNextLineItemKey(items) {
+    const keys = Object.keys(items);
+    const highestKey = this.getOrderedKeys(items)[keys.length-1];
     return (parseInt(highestKey, 10) || 0) + 1;
   }
 
   calcAmount(item) {
-    const amt = parseInt(item.quantity, 10) * parseInt(item.unitPrice, 10);
+    const amt = parseInt(item.quantity, 10) * parseInt(item.unit_price, 10);
     return amt || 0;
   }
 
@@ -106,29 +126,29 @@ class EditInvoice extends Component {
   }
 
   renderLineItems() {
-    const lineItems = this.state.lineItems;
-    return this.getOrderedKeys(lineItems).map((key, index) => {
-      const item = lineItems[key];
+    const items = this.state.invoice.items;
+    return this.getOrderedKeys(items).map((key, index) => {
+      const item = items[key];
       return (
         <tr key={parseInt(key, 10)}>
           <td>
-            <input type="text" name={`lineItems.description.${key}`} required
+            <input type="text" name={`items.description.${key}`} required
               placeholder="Development on new features"
               value={item.description}
               onChange={this.handleChange} />
           </td>
           <td>
-            <input type="text" name={`lineItems.quantity.${key}`} required
+            <input type="text" name={`items.quantity.${key}`} required
               value={item.quantity}
               onChange={this.handleChange} />
           </td>
           <td>
-            <input type="text" name={`lineItems.unitPrice.${key}`} required
-              value={item.unitPrice}
+            <input type="text" name={`items.unit_price.${key}`} required
+              value={item.unit_price}
               onChange={this.handleChange} />
           </td>
           <td>
-            <input type="text" name={`lineItems.amount.${key}`} disabled
+            <input type="text" name={`items.amount.${key}`} disabled
               value={this.calcAmount(item)} />
           </td>
           <td>
@@ -141,57 +161,58 @@ class EditInvoice extends Component {
   }
 
   render() {
+    const invoice = this.state.invoice;
     return (
       <div className="container">
         <h1>Edit Invoice</h1>
         <form className="edit-form" onSubmit={this.handleSubmit}>
           <div>
             <label>Your Business</label>
-            <input type="text" name="entityName" required autoFocus
+            <input type="text" name="entity_name" required autoFocus
               placeholder="Foobar LLC"
-              value={this.state.entityName}
+              value={invoice.entity_name}
               onChange={this.handleChange} />
           </div>
           <div>
             <label>Your Client</label>
-            <input type="text" name="clientName" required
+            <input type="text" name="client_name" required
               placeholder="Bankcorp"
-              value={this.state.clientName}
+              value={invoice.client_name}
               onChange={this.handleChange} />
           </div>
           <div>
             <label>Invoice ID</label>
-            <input type="text" name="invoiceId" required
-              value={this.state.invoiceId}
+            <input type="text" name="invoice_id" required
+              value={invoice.invoice_id}
               onChange={this.handleChange} />
           </div>
           <div>
             <label>Date Issued</label>
-            <input type="date" name="issueDate" required
-              value={this.state.issueDate}
+            <input type="date" name="issue_date" required
+              value={invoice.issue_date}
               onChange={this.handleChange} />
           </div>
           <div>
             <label>Due Date</label>
-            <input type="date" name="dueDate" required
-              value={this.state.dueDate}
+            <input type="date" name="due_date" required
+              value={invoice.due_date}
               onChange={this.handleChange} />
           </div>
           <div>
             <label>Paid</label>
-            <input type="date" name="dueDate"
-              value={this.state.paidDate}
+            <input type="date" name="due_date"
+              value={invoice.paid_at || ''}
               onChange={this.handleChange} />
           </div>
           <div>
             <label>Subject</label>
             <input type="text" name="subject" required
-              value={this.state.subjectText}
+              value={invoice.subject}
               onChange={this.handleChange} />
           </div>
           <div>
             <label>Notes</label>
-            <textarea value={this.state.notes} />
+            <textarea value={invoice.notes} />
           </div>
           <table>
             <thead>
@@ -212,10 +233,13 @@ class EditInvoice extends Component {
           <button onClick={this.handleAddLineItem}>New Line Item</button>
           <hr/>
           <button type="submit">Save</button>
+          <br/>
+          <br/>
+          <Link to={`/invoices/${invoice.invoice_id}`}>Cancel</Link>
         </form>
       </div>
     );
   }
 }
 
-export default EditInvoice;
+export default withRouter(EditInvoice);
