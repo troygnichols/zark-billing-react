@@ -112,6 +112,7 @@ class EditInvoice extends Component {
   handleSubmit(event) {
     event.preventDefault();
     const id = this.state.invoice.id;
+    const self = this;
     fetch(`http://localhost:4000/invoices/${id}`, {
       method: 'PUT',
       headers: {
@@ -122,7 +123,7 @@ class EditInvoice extends Component {
     })
       .then(resp => resp.json)
       .then((data) => {
-        console.log('saved invoice');
+        self.props.history.push(`/invoices/${id}`);
       });
   }
 
@@ -143,7 +144,6 @@ class EditInvoice extends Component {
       }
     };
     delete payload.invoice.items;
-    console.log(payload);
     return JSON.stringify(payload);
   }
 

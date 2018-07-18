@@ -7,8 +7,9 @@ class Invoice extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      invoice: {}
+      invoice: { items: [] }
     };
+    this.handleGeneratePdf = this.handleGeneratePdf.bind(this);
   }
 
   componentDidMount() {
@@ -16,18 +17,46 @@ class Invoice extends Component {
     fetch(`http://localhost:4000/invoices/${id}`)
       .then(resp => resp.json())
       .then((data) => {
-        console.log('data', data);
         this.setState({
           invoice: data.invoice
         });
       });
   }
 
+  // TODO: this is duplicated in EditInvoice.js, extract somewhere
+  calcAmount(item) {
+    const amt = parseInt(item.quantity, 10) * parseInt(item.unit_price, 10);
+    return amt || 0;
+  }
+
+  calcTotalAmount(invoice) {
+    const self = this;
+    return invoice.items.reduce((acc, item) => (
+      acc + self.calcAmount(item)
+    ), 0);
+  }
+
+  handleGeneratePdf(event) {
+    event.preventDefault();
+    console.log('gen pdf');
+  }
+
+  renderLineItems() {
+    return this.state.invoice.items.map((item) => (
+      <tr key={item.id}>
+        <td>{item.description}</td>
+        <td>{item.quantity}</td>
+        <td>{item.unit_price}</td>
+        <td>${this.calcAmount(item)}</td>
+      </tr>
+    ));
+  }
+
   render() {
     const invoice = this.state.invoice;
     return (
       <div>
-        <table>
+        <table border="1">
           <tbody>
             <tr>
               <td>Invoice ID</td>
@@ -35,7 +64,11 @@ class Invoice extends Component {
             </tr>
             <tr>
               <td>Your Business</td>
-              <td>{invoice.entity_id}</td>
+              <td>{invoice.entity_name}</td>
+            </tr>
+            <tr>
+              <td>Client</td>
+              <td>{invoice.client_name}</td>
             </tr>
             <tr>
               <td>Issued On</td>
@@ -60,7 +93,30 @@ class Invoice extends Component {
           </tbody>
         </table>
 
+        <h4>Line Items</h4>
+
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Unit Price</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.renderLineItems()}
+            <tr>
+              <td colSpan="3"><strong>Total</strong></td>
+              <td>${this.calcTotalAmount(invoice)}</td>
+            </tr>
+          </tbody>
+        </table>
+
         <hr/>
+        <button onClick={this.handleGeneratePdf}>Generate PDF</button>
+        <br/>
+        <br/>
         <Link to={`/invoices/${invoice.id}/edit`}>Edit Invoice</Link>
       </div>
     );
