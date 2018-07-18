@@ -29,7 +29,6 @@ class EditInvoice extends Component {
     const value = target.type === 'checkbox' ? target.checked : target.value
     const name = target.name;
 
-    // TODO: some more generic way to do this?
     if (name.startsWith('lineItems')) {
       const [, fieldName, index] = name.split('.');
       this.setState((prevState) => {
@@ -51,7 +50,6 @@ class EditInvoice extends Component {
 
   handleDeleteLineItem(event) {
     event.preventDefault();
-    // TODO: better way to get this than data attribute?
     const keyToDel = event.target.getAttribute('data-key');
     const self = this;
     this.setState((prevState) => {
@@ -144,68 +142,78 @@ class EditInvoice extends Component {
 
   render() {
     return (
-      <form className="edit-form" onSubmit={this.handleSubmit}>
-        <div>
-          <label>Your Business</label>
-          <input type="text" name="entityName" required autoFocus
-            placeholder="Foobar LLC"
-            value={this.state.entityName}
-            onChange={this.handleChange} />
-        </div>
-        <div>
-          <label>Your Client</label>
-          <input type="text" name="clientName" required
-            placeholder="Bankcorp"
-            value={this.state.clientName}
-            onChange={this.handleChange} />
-        </div>
-        <div>
-          <label>Invoice ID</label>
-          <input type="text" name="invoiceId" required
-            value={this.state.invoiceId}
-            onChange={this.handleChange} />
-        </div>
-        <div>
-          <label>Date Issued</label>
-          <input type="date" name="issueDate" required
-            value={this.state.issueDate}
-            onChange={this.handleChange} />
-        </div>
-        <div>
-          <label>Due Date</label>
-          <input type="date" name="dueDate" required
-            value={this.state.dueDate}
-            onChange={this.handleChange} />
-        </div>
-        <div>
-          <label>Paid</label>
-          <input type="date" name="dueDate"
-            value={this.state.paidDate}
-            onChange={this.handleChange} />
-        </div>
-        <div>
-          <label>Subject</label>
-          <textarea value={this.state.subjectText} />
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th>Quantity</th>
-              <th>$ Unit Price</th>
-              <th>$ Amount</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.renderLineItems()}
-          </tbody>
-        </table>
+      <div className="container">
+        <h1>Edit Invoice</h1>
+        <form className="edit-form" onSubmit={this.handleSubmit}>
+          <div>
+            <label>Your Business</label>
+            <input type="text" name="entityName" required autoFocus
+              placeholder="Foobar LLC"
+              value={this.state.entityName}
+              onChange={this.handleChange} />
+          </div>
+          <div>
+            <label>Your Client</label>
+            <input type="text" name="clientName" required
+              placeholder="Bankcorp"
+              value={this.state.clientName}
+              onChange={this.handleChange} />
+          </div>
+          <div>
+            <label>Invoice ID</label>
+            <input type="text" name="invoiceId" required
+              value={this.state.invoiceId}
+              onChange={this.handleChange} />
+          </div>
+          <div>
+            <label>Date Issued</label>
+            <input type="date" name="issueDate" required
+              value={this.state.issueDate}
+              onChange={this.handleChange} />
+          </div>
+          <div>
+            <label>Due Date</label>
+            <input type="date" name="dueDate" required
+              value={this.state.dueDate}
+              onChange={this.handleChange} />
+          </div>
+          <div>
+            <label>Paid</label>
+            <input type="date" name="dueDate"
+              value={this.state.paidDate}
+              onChange={this.handleChange} />
+          </div>
+          <div>
+            <label>Subject</label>
+            <input type="text" name="subject" required
+              value={this.state.subjectText}
+              onChange={this.handleChange} />
+          </div>
+          <div>
+            <label>Notes</label>
+            <textarea value={this.state.notes} />
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>$ Unit Price</th>
+                <th>$ Amount</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.renderLineItems()}
+            </tbody>
+          </table>
 
-        <button onClick={this.handleAddLineItem}>New Line Item</button>
-        <hr/>
-        <button type="submit">Save</button>
-      </form>
+          <hr/>
+          <button onClick={this.handleAddLineItem}>New Line Item</button>
+          <hr/>
+          <button type="submit">Save</button>
+        </form>
+      </div>
     );
   }
 }
