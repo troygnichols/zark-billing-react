@@ -51,7 +51,7 @@ class Invoice extends Component {
             </tr>
             <tr>
               <td>Payment</td>
-              <td>{invoice.paid_at || 'Not paid'}</td>
+              <td>{invoice.paid_date || 'Not paid'}</td>
             </tr>
             <tr>
               <td>Notes</td>

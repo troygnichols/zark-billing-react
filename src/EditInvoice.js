@@ -12,13 +12,14 @@ class EditInvoice extends Component {
         invoice_id: '',
         due_date: '',
         issue_date: '',
-        paid_at: '',
+        paid_date: '',
         subject: '',
         items: {
           // 2: {description: 'foobar', quantity: 2, unit_price: 100},
           // 1: {description: 'barz', quantity: 3, unit_price: 75},
         }
-      }
+      },
+      itemIdsToDelete: new Set()
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -31,33 +32,32 @@ class EditInvoice extends Component {
     fetch(`http://localhost:4000/invoices/${id}`)
       .then(resp => resp.json())
       .then((data) => {
-        this.setState({
-          invoice: data.invoice
-        });
+        this.setState((prevState) => (
+          { ...prevState, invoice: data.invoice }
+        ));
       });
   }
 
   handleChange(event) {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value
-    const name = target.name;
+    const name = target.name || target.getAttribute('data-name');
 
     if (name.startsWith('items')) {
       const [, fieldName, index] = name.split('.');
-      this.setState((prevState) => {
-        return {
-          ...prevState,
-          items: {
-            ...prevState.invoice.items,
-            [index]: {
-              ...prevState.invoice.items[index],
-              [fieldName]: value
-            }
-          }
-        };
-      });
+      this.setState((prevState) => (
+        { ...prevState, invoice: {
+            ...prevState.invoice, items: {
+              ...prevState.invoice.items,
+              [index]: {
+                ...prevState.invoice.items[index],
+                [fieldName]: value } } } }
+      ));
     } else {
-      this.setState({ [name]: value });
+      this.setState((prevState) => (
+        { ...prevState, invoice: {
+            ...prevState.invoice, [name]: value } }
+      ));
     }
   }
 
@@ -68,9 +68,15 @@ class EditInvoice extends Component {
     this.setState((prevState) => {
       const newItems = {};
       const keys = self.getOrderedKeys(prevState.invoice.items);
+      const itemIdsToDel = prevState.itemIdsToDelete;
       keys.forEach((key, index) => {
-        if (key !== parseInt(keyToDel, 10)) {
-          newItems[Object.keys(newItems).length] = prevState.invoice.items[key];
+        const item = prevState.invoice.items[key];
+        if (key === parseInt(keyToDel, 10)) {
+          if (typeof(item.id) !== 'undefined' && item.id !== null) {
+            itemIdsToDel.add(item.id)
+          }
+        } else {
+          newItems[Object.keys(newItems).length] = item;
         }
       });
       return {
@@ -78,7 +84,8 @@ class EditInvoice extends Component {
         invoice: {
           ...prevState.invoice,
           items: newItems
-        }
+        },
+        itemIdsToDelete: itemIdsToDel
       };
     });
   }
@@ -104,7 +111,40 @@ class EditInvoice extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log('saving state', this.state);
+    const id = this.state.invoice.id;
+    fetch(`http://localhost:4000/invoices/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: this.buildInvoicePayload()
+    })
+      .then(resp => resp.json)
+      .then((data) => {
+        console.log('saved invoice');
+      });
+  }
+
+  buildInvoicePayload() {
+    const invoice = this.state.invoice;
+    const itemIdsToDel = this.state.itemIdsToDelete;
+    const itemAttrs = this.getOrderedKeys(invoice.items).map((key) => {
+      const item = invoice.items[key];
+      return item;
+    }).concat([...itemIdsToDel].map(id => (
+      {id, _destroy: true}
+    )));
+    const payload = {
+      invoice: {
+        ...invoice,
+        ...{ items_attributes: itemAttrs
+        }
+      }
+    };
+    delete payload.invoice.items;
+    console.log(payload);
+    return JSON.stringify(payload);
   }
 
   getNextLineItemKey(items) {
@@ -199,9 +239,9 @@ class EditInvoice extends Component {
               onChange={this.handleChange} />
           </div>
           <div>
-            <label>Paid</label>
-            <input type="date" name="due_date"
-              value={invoice.paid_at || ''}
+            <label>Paid Date</label>
+            <input type="date" name="paid_date"
+              value={invoice.paid_date}
               onChange={this.handleChange} />
           </div>
           <div>
@@ -212,7 +252,8 @@ class EditInvoice extends Component {
           </div>
           <div>
             <label>Notes</label>
-            <textarea value={invoice.notes} />
+            <textarea data-name="notes" value={invoice.notes}
+              onChange={this.handleChange} />
           </div>
           <table>
             <thead>

@@ -23,7 +23,7 @@ class InvoiceList extends Component {
 
   buildInvoices(data) {
     return data.invoices.map((invoice) => {
-      const paid = invoice.paid_at ? 'Yes' : 'No';
+      const paid = invoice.paid_date ? 'Yes' : 'No';
       return (
         <tr key={invoice.id}>
           <td>{invoice.invoice_id}</td>
