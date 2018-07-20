@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
+import PDF from './pdf.js';
+import blobStream from 'blob-stream';
 
+// import 'babel-polyfill'
+// import { Page, Text, View, Document, StyleSheet } from '@react-pdf/core';
 
 class Invoice extends Component {
 
@@ -38,7 +42,37 @@ class Invoice extends Component {
 
   handleGeneratePdf(event) {
     event.preventDefault();
-    console.log('gen pdf');
+    // const styles = StyleSheet.create({
+    //   page: {
+    //     flexDirection: 'row',
+    //     backgroundColor: '#E4E4E4'
+    //   },
+    //   section: {
+    //     margin: 10,
+    //     padding: 10,
+    //     flexGrow: 1
+    //   }
+    // });
+
+    // const doc = (
+    //   <Document>
+    //     <Page size="A4" style={styles.page}>
+    //       <View style={styles.section}>
+    //         <Text>Section #1</Text>
+    //       </View>
+    //       <View style={styles.section}>
+    //         <Text>Section #2</Text>
+    //       </View>
+    //     </Page>
+    //   </Document>
+    // );
+
+    const stream = blobStream();
+    stream.on('finish', function() {
+      const url = this.toBlobURL('application/pdf');
+      window.open(url);
+    });
+    PDF.createInvoice(stream, this.state.invoice);
   }
 
   renderLineItems() {
@@ -112,6 +146,8 @@ class Invoice extends Component {
             </tr>
           </tbody>
         </table>
+
+        {this.state.document}
 
         <hr/>
         <button onClick={this.handleGeneratePdf}>Generate PDF</button>
