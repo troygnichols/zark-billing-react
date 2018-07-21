@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@react-pdf/core": "^0.7.6",
     "autoprefixer": "7.1.6",
     "babel-core": "6.26.0",
     "babel-eslint": "7.2.3",
@@ -32,6 +31,7 @@
     "lodash.difference": "^4.5.0",
     "lodash.get": "^4.4.2",
     "object-assign": "4.1.1",
+    "pdfkit": "^0.8.3",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",
     "promise": "8.0.1",
