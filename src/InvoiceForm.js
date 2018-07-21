@@ -84,17 +84,17 @@ class InvoiceForm extends Component {
           <td>
             <input type="text" name={`items.description.${key}`} required
               placeholder="Development on new features"
-              value={item.description}
+              value={item.description || ''}
               onChange={this.handleChange} />
           </td>
           <td>
             <input type="text" name={`items.quantity.${key}`} required
-              value={item.quantity}
+              value={item.quantity || 0}
               onChange={this.handleChange} />
           </td>
           <td>
             <input type="text" name={`items.unit_price.${key}`} required
-              value={item.unit_price}
+              value={item.unit_price || 0}
               onChange={this.handleChange} />
           </td>
           <td>
@@ -123,7 +123,7 @@ class InvoiceForm extends Component {
         <div>
           <label>Your Business Address</label>
           <br/>
-          <textarea data-name="entity_address" value={invoice.entity_address}
+          <textarea data-name="entity_address" value={invoice.entity_address || ''}
             onChange={this.handleChange} cols="40" rows="2" />
         </div>
         <div>
@@ -166,7 +166,7 @@ class InvoiceForm extends Component {
         <div>
           <label>Notes</label>
           <br/>
-          <textarea data-name="notes" value={invoice.notes}
+          <textarea data-name="notes" value={invoice.notes || ''}
             onChange={this.handleChange} cols="40" rows="5" />
         </div>
         <table>

@@ -20,9 +20,9 @@ class App extends Component {
                 <li><Link to='/invoices'>Home</Link></li>
               </ul>
               <ul className="login-nav">
-                <li><a href="javascript:alert('TODO');">Login</a></li>
-                <li><a href="javascript:alert('TODO');">Logout</a></li>
-                <li><a href="javascript:alert('TODO');">User</a></li>
+                <li><a href="#login">Login</a></li>
+                <li><a href="#logout">Logout</a></li>
+                <li><a href="#profile">User</a></li>
               </ul>
             </div>
           </header>

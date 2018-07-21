@@ -50,7 +50,7 @@ class NewInvoice extends Component {
         <InvoiceForm
           invoice={this.state.invoice}
           onChange={this.handleChange} />
-        <a href="#" className="button" onClick={this.handleSubmit}>Save</a>
+        <a href="#save" className="button" onClick={this.handleSubmit}>Save</a>
         <Link to="/invoices" className="cancel button">Cancel</Link>
         <br/>
         <br/>
