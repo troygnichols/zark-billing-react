@@ -3,6 +3,8 @@ import './App.css';
 
 import { Link } from 'react-router-dom';
 
+import './InvoiceList.css';
+
 class InvoiceList extends Component {
   constructor() {
     super();
@@ -27,13 +29,13 @@ class InvoiceList extends Component {
       return (
         <tr key={invoice.id}>
           <td>{invoice.invoice_id}</td>
-          <td>{invoice.entity_name}</td>
+          <td className="hidesmall">{invoice.entity_name}</td>
           <td>{invoice.client_name}</td>
           <td>{invoice.issue_date}</td>
-          <td>{invoice.due_date}</td>
-          <td>{invoice.subject}</td>
-          <td>{invoice.notes}</td>
-          <td>{paid}</td>
+          <td className="hidesmall">{invoice.due_date}</td>
+          <td className="hidesmall">{invoice.subject}</td>
+          <td className="hidesmall">{invoice.notes}</td>
+          <td className="hidesmall">{paid}</td>
           <td>
             <Link to={`/invoices/${invoice.id}`}>View</Link>
           </td>
@@ -44,17 +46,17 @@ class InvoiceList extends Component {
 
   render() {
     return (
-      <table>
+      <table border="1" className="invoice-list-table">
         <thead>
           <tr>
             <th>Invoice ID</th>
-            <th>Your Business</th>
+            <th className="hidesmall">Your Business</th>
             <th>Client</th>
             <th>Issued</th>
-            <th>Due</th>
-            <th>Subject</th>
-            <th>Notes</th>
-            <th>Paid?</th>
+            <th className="hidesmall">Due</th>
+            <th className="hidesmall">Subject</th>
+            <th className="hidesmall">Notes</th>
+            <th className="hidesmall">Paid?</th>
             <th>
             </th>
           </tr>

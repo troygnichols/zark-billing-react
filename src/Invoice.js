@@ -90,7 +90,13 @@ class Invoice extends Component {
     const invoice = this.state.invoice;
     return (
       <div>
-        <table border="1">
+        <nav>
+          <ul className="breadcrumb">
+            <li><Link to='/invoices'>Invoices</Link></li>
+            <li>Invoice {invoice.invoice_id}</li>
+          </ul>
+        </nav>
+        <table border="1" className="page-content">
           <tbody>
             <tr>
               <td>Invoice ID</td>
@@ -149,11 +155,12 @@ class Invoice extends Component {
 
         {this.state.document}
 
-        <hr/>
+        <br/>
         <button onClick={this.handleGeneratePdf}>Generate PDF</button>
+        <hr/>
+        <Link to={`/invoices/${invoice.id}/edit`} className="button">Edit Invoice</Link>
         <br/>
         <br/>
-        <Link to={`/invoices/${invoice.id}/edit`}>Edit Invoice</Link>
       </div>
     );
   }

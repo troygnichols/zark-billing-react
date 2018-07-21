@@ -204,6 +204,13 @@ class EditInvoice extends Component {
     const invoice = this.state.invoice;
     return (
       <div className="container">
+        <nav>
+          <ul className="breadcrumb">
+            <li><Link to="/invoices">Invoices</Link></li>
+            <li><Link to={`/invoices/${invoice.id}`}>Invoice {invoice.invoice_id}</Link></li>
+            <li>Edit Invoice</li>
+          </ul>
+        </nav>
         <h1>Edit Invoice</h1>
         <form className="edit-form" onSubmit={this.handleSubmit}>
           <div>
@@ -241,7 +248,7 @@ class EditInvoice extends Component {
           <div>
             <label>Paid Date</label>
             <input type="date" name="paid_date"
-              value={invoice.paid_date}
+              value={invoice.paid_date || ''}
               onChange={this.handleChange} />
           </div>
           <div>
@@ -252,8 +259,9 @@ class EditInvoice extends Component {
           </div>
           <div>
             <label>Notes</label>
+            <br/>
             <textarea data-name="notes" value={invoice.notes}
-              onChange={this.handleChange} />
+              onChange={this.handleChange} cols="40" rows="5" />
           </div>
           <table>
             <thead>
@@ -270,13 +278,14 @@ class EditInvoice extends Component {
             </tbody>
           </table>
 
-          <hr/>
+          <br/>
           <button onClick={this.handleAddLineItem}>New Line Item</button>
           <hr/>
-          <button type="submit">Save</button>
+          <Link to={`/invoices/${invoice.id}`} className="cancel button">Cancel</Link>
+          <a href="#" className="button" onClick={this.handleSubmit}>Save</a>
           <br/>
           <br/>
-          <Link to={`/invoices/${invoice.invoice_id}`}>Cancel</Link>
+
         </form>
       </div>
     );
