@@ -1,13 +1,10 @@
 # TODO
 
 - auth
-- remove unused react-pdf stuff (deps, webpack config etc)
-- address, multi-line on PDF
 - notification that save was successful
-- config file for backend url etc
 - datatables
 - loading screening for heroku dyno wakeup
-- resort line items
+- re-sort line items
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
