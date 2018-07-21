@@ -1,3 +1,8 @@
+@font-face {
+  font-family: OCRA;
+  src: url("OCRA.otf") format("opentype");
+}
+
 * {
   box-sizing: border-box;
 }
@@ -11,8 +16,8 @@
 
 .App {
   background-color: #303030;
-  color: #ffcc33;
-  font-family: Georgia;
+  color: #33CC00;
+  font-family: OCRA;
 }
 
 header {
@@ -37,6 +42,7 @@ header a {
 
 footer {
   background-color: red;
+  color: #ffcc33;
   padding: 1em 0;
   height: 6em;
   text-align: right;
@@ -92,7 +98,11 @@ a {
 
 .cancel {
   background-color: #505050;
- }
+}
+
+table {
+ border-collapse: collapse;
+}
 
 @media (min-width: 769px) {
   .container {

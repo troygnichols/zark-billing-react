@@ -46,7 +46,7 @@ class InvoiceList extends Component {
 
   render() {
     return (
-      <table border="1" className="invoice-list-table">
+      <table className="invoice-list-table">
         <thead>
           <tr>
             <th>Invoice ID</th>

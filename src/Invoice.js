@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import PDF from './pdf.js';
 import blobStream from 'blob-stream';
+import './Invoice.css';
 
 // import 'babel-polyfill'
 // import { Page, Text, View, Document, StyleSheet } from '@react-pdf/core';
@@ -96,7 +97,7 @@ class Invoice extends Component {
             <li>Invoice {invoice.invoice_id}</li>
           </ul>
         </nav>
-        <table border="1" className="page-content">
+        <table className="invoice-table">
           <tbody>
             <tr>
               <td>Invoice ID</td>
@@ -135,7 +136,7 @@ class Invoice extends Component {
 
         <h4>Line Items</h4>
 
-        <table border="1">
+        <table>
           <thead>
             <tr>
               <th>Description</th>
