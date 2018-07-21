@@ -49,7 +49,7 @@ export function createInvoice(pipe, invoice, options) {
     // Entity Address
     .font(mainFont, 8)
     .fillColor(darkGrey)
-    .text(invoice.entity_address, 425, 80)
+    .text(invoice.entity_address || '', 425, 80)
 
     // Invoice Info
     .font(mainFont, 9)

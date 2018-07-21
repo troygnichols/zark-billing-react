@@ -110,8 +110,8 @@ class EditInvoice extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    const history = this.props.history;
     const id = this.state.invoice.id;
-    const self = this;
     fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
       method: 'PUT',
       headers: {
@@ -121,8 +121,8 @@ class EditInvoice extends Component {
       body: this.buildInvoicePayload()
     })
       .then(resp => resp.json)
-      .then((data) => {
-        self.props.history.push(`/invoices/${id}`);
+      .then(data => {
+        history.push(`/invoices/${id}`);
       });
   }
 
@@ -281,8 +281,8 @@ class EditInvoice extends Component {
           <br/>
           <button onClick={this.handleAddLineItem}>New Line Item</button>
           <hr/>
-          <Link to={`/invoices/${invoice.id}`} className="cancel button">Cancel</Link>
           <a href="#" className="button" onClick={this.handleSubmit}>Save</a>
+          <Link to={`/invoices/${invoice.id}`} className="cancel button">Cancel</Link>
           <br/>
           <br/>
 

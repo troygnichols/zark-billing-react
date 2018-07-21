@@ -7,8 +7,8 @@
   box-sizing: border-box;
 }
 
- ol,
- ul {
+ol,
+ul {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -102,6 +102,10 @@ a {
 
 .button.action {
   background-color: green;
+}
+
+.button.delete {
+  background-color: black;
 }
 
 table {

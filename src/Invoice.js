@@ -14,6 +14,7 @@ class Invoice extends Component {
       invoice: { items: [] }
     };
     this.handleGeneratePdf = this.handleGeneratePdf.bind(this);
+    this.handleDeleteInvoice = this.handleDeleteInvoice.bind(this);
   }
 
   componentDidMount() {
@@ -36,6 +37,25 @@ class Invoice extends Component {
       window.open(url);
     });
     createInvoice(stream, this.state.invoice);
+  }
+
+  handleDeleteInvoice(event) {
+    event.preventDefault();
+    const id = this.state.invoice.id;
+    const history = this.props.history;
+    if (window.confirm('Are you sure you want to delete this invoice?')) {
+      fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+        .then(resp => resp.json)
+        .then(data => {
+          history.push('/invoices');
+        });
+    }
   }
 
   renderLineItems() {
@@ -124,8 +144,13 @@ class Invoice extends Component {
         {this.state.document}
 
         <hr/>
-        <Link to={`/invoices/${invoice.id}/edit`} className="button">Edit Invoice</Link>
-        <a href="#" onClick={this.handleGeneratePdf} className="action button">Generate PDF</a>
+        <div className="clearfix">
+          <div style={{float: 'left'}}>
+            <Link to={`/invoices/${invoice.id}/edit`} className="button">Edit Invoice</Link>
+            <a href="#" onClick={this.handleGeneratePdf} className="action button">Generate PDF</a>
+          </div>
+          <a style={{float: 'right'}} href="#" onClick={this.handleDeleteInvoice} className="delete button">✖ Delete Invoice</a>
+        </div>
         <br/>
         <br/>
       </div>
