@@ -3,6 +3,8 @@ import './App.css';
 
 import { Link } from 'react-router-dom';
 
+import { getConfig } from './config.js';
+
 import './InvoiceList.css';
 
 class InvoiceList extends Component {
@@ -14,7 +16,7 @@ class InvoiceList extends Component {
   }
 
   componentDidMount() {
-    fetch('http://localhost:4000/invoices')
+    fetch(`${getConfig('api.baseUrl')}/invoices`)
       .then(resp => resp.json())
       .then((data) => {
         this.setState({

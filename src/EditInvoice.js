@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { calcAmount } from './util';
+import { getConfig } from './config.js';
 
 class EditInvoice extends Component {
 
@@ -15,10 +16,7 @@ class EditInvoice extends Component {
         issue_date: '',
         paid_date: '',
         subject: '',
-        items: {
-          // 2: {description: 'foobar', quantity: 2, unit_price: 100},
-          // 1: {description: 'barz', quantity: 3, unit_price: 75},
-        }
+        items: {}
       },
       itemIdsToDelete: new Set()
     };
@@ -30,7 +28,7 @@ class EditInvoice extends Component {
 
   componentDidMount() {
     const id = this.props.match.params.id;
-    fetch(`http://localhost:4000/invoices/${id}`)
+    fetch(`${getConfig('api.baseUrl')}/invoices/${id}`)
       .then(resp => resp.json())
       .then((data) => {
         this.setState((prevState) => (
@@ -114,7 +112,7 @@ class EditInvoice extends Component {
     event.preventDefault();
     const id = this.state.invoice.id;
     const self = this;
-    fetch(`http://localhost:4000/invoices/${id}`, {
+    fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

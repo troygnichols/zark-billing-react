@@ -4,6 +4,7 @@ import { createInvoice } from './pdf.js';
 import blobStream from 'blob-stream';
 import { calcAmount, calcTotalAmount } from './util';
 import './Invoice.css';
+import { getConfig } from './config.js';
 
 class Invoice extends Component {
 
@@ -17,7 +18,7 @@ class Invoice extends Component {
 
   componentDidMount() {
     const id = this.props.match.params.id;
-    fetch(`http://localhost:4000/invoices/${id}`)
+    fetch(`${getConfig('api.baseUrl')}/invoices/${id}`)
       .then(resp => resp.json())
       .then((data) => {
         this.setState({
