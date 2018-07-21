@@ -4,9 +4,6 @@ import PDF from './pdf.js';
 import blobStream from 'blob-stream';
 import './Invoice.css';
 
-// import 'babel-polyfill'
-// import { Page, Text, View, Document, StyleSheet } from '@react-pdf/core';
-
 class Invoice extends Component {
 
   constructor(props) {
@@ -43,30 +40,6 @@ class Invoice extends Component {
 
   handleGeneratePdf(event) {
     event.preventDefault();
-    // const styles = StyleSheet.create({
-    //   page: {
-    //     flexDirection: 'row',
-    //     backgroundColor: '#E4E4E4'
-    //   },
-    //   section: {
-    //     margin: 10,
-    //     padding: 10,
-    //     flexGrow: 1
-    //   }
-    // });
-
-    // const doc = (
-    //   <Document>
-    //     <Page size="A4" style={styles.page}>
-    //       <View style={styles.section}>
-    //         <Text>Section #1</Text>
-    //       </View>
-    //       <View style={styles.section}>
-    //         <Text>Section #2</Text>
-    //       </View>
-    //     </Page>
-    //   </Document>
-    // );
 
     const stream = blobStream();
     stream.on('finish', function() {
@@ -108,6 +81,10 @@ class Invoice extends Component {
               <td>{invoice.entity_name}</td>
             </tr>
             <tr>
+              <td>Your Address</td>
+              <td>{invoice.entity_address}</td>
+            </tr>
+            <tr>
               <td>Client</td>
               <td>{invoice.client_name}</td>
             </tr>
@@ -136,30 +113,29 @@ class Invoice extends Component {
 
         <h4>Line Items</h4>
 
-        <table>
+        <table className="invoice-table">
           <thead>
             <tr>
               <th>Description</th>
               <th>Qty</th>
               <th>Unit Price</th>
-              <th>Amount</th>
+              <th><strong>Amount</strong></th>
             </tr>
           </thead>
           <tbody>
             {this.renderLineItems()}
             <tr>
               <td colSpan="3"><strong>Total</strong></td>
-              <td>${this.calcTotalAmount(invoice)}</td>
+              <td><strong>${this.calcTotalAmount(invoice)}</strong></td>
             </tr>
           </tbody>
         </table>
 
         {this.state.document}
 
-        <br/>
-        <button onClick={this.handleGeneratePdf}>Generate PDF</button>
         <hr/>
         <Link to={`/invoices/${invoice.id}/edit`} className="button">Edit Invoice</Link>
+        <a href="#" onClick={this.handleGeneratePdf} className="action button">Generate PDF</a>
         <br/>
         <br/>
       </div>

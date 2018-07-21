@@ -96,8 +96,12 @@ a {
   margin-right: .8em;
 }
 
-.cancel {
+.button.cancel {
   background-color: #505050;
+}
+
+.button.action {
+  background-color: green;
 }
 
 table {
