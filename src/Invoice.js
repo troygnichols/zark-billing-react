@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
-import PDF from './pdf.js';
+import { createInvoice } from './pdf.js';
 import blobStream from 'blob-stream';
+import { calcAmount, calcTotalAmount } from './util';
 import './Invoice.css';
 
 class Invoice extends Component {
@@ -25,19 +26,6 @@ class Invoice extends Component {
       });
   }
 
-  // TODO: this is duplicated in EditInvoice.js, extract somewhere
-  calcAmount(item) {
-    const amt = parseInt(item.quantity, 10) * parseInt(item.unit_price, 10);
-    return amt || 0;
-  }
-
-  calcTotalAmount(invoice) {
-    const self = this;
-    return invoice.items.reduce((acc, item) => (
-      acc + self.calcAmount(item)
-    ), 0);
-  }
-
   handleGeneratePdf(event) {
     event.preventDefault();
 
@@ -46,7 +34,7 @@ class Invoice extends Component {
       const url = this.toBlobURL('application/pdf');
       window.open(url);
     });
-    PDF.createInvoice(stream, this.state.invoice);
+    createInvoice(stream, this.state.invoice);
   }
 
   renderLineItems() {
@@ -55,13 +43,14 @@ class Invoice extends Component {
         <td>{item.description}</td>
         <td>{item.quantity}</td>
         <td>{item.unit_price}</td>
-        <td>${this.calcAmount(item)}</td>
+        <td>${calcAmount(item)}</td>
       </tr>
     ));
   }
 
   render() {
     const invoice = this.state.invoice;
+    const totalStyle = { backgroundColor: '#99CC33', color: '#000', fontSize: '120%'};
     return (
       <div>
         <nav>
@@ -82,7 +71,7 @@ class Invoice extends Component {
             </tr>
             <tr>
               <td>Your Address</td>
-              <td>{invoice.entity_address}</td>
+              <td style={{whiteSpace: 'pre-line'}}>{(invoice.entity_address || '')}</td>
             </tr>
             <tr>
               <td>Client</td>
@@ -125,8 +114,8 @@ class Invoice extends Component {
           <tbody>
             {this.renderLineItems()}
             <tr>
-              <td colSpan="3"><strong>Total</strong></td>
-              <td><strong>${this.calcTotalAmount(invoice)}</strong></td>
+              <td style={totalStyle} colSpan="3">Total</td>
+              <td style={totalStyle}>${calcTotalAmount(invoice)}</td>
             </tr>
           </tbody>
         </table>

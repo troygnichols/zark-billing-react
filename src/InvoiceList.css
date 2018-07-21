@@ -1,10 +1,10 @@
 table.invoice-list-table {
-  margin-top: 2em;
+  margin: 2em 0;
 }
 
 table.invoice-list-table th,
 table.invoice-list-table td {
   padding: .6em;
-  border: 1px solid red;
+  border: 3px solid black;
 }
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
+import { calcAmount } from './util';
 
 class EditInvoice extends Component {
 
@@ -153,11 +154,6 @@ class EditInvoice extends Component {
     return (parseInt(highestKey, 10) || 0) + 1;
   }
 
-  calcAmount(item) {
-    const amt = parseInt(item.quantity, 10) * parseInt(item.unit_price, 10);
-    return amt || 0;
-  }
-
   getOrderedKeys(items) {
     const keys =  Object.keys(items).map((key) => {
       return parseInt(key, 10)
@@ -189,7 +185,7 @@ class EditInvoice extends Component {
           </td>
           <td>
             <input type="text" name={`items.amount.${key}`} disabled
-              value={this.calcAmount(item)} />
+              value={calcAmount(item)} />
           </td>
           <td>
             <button onClick={this.handleDeleteLineItem} data-key={key}>✖</button>
@@ -219,6 +215,12 @@ class EditInvoice extends Component {
               placeholder="Foobar LLC"
               value={invoice.entity_name}
               onChange={this.handleChange} />
+          </div>
+          <div>
+            <label>Your Business Address</label>
+            <br/>
+            <textarea data-name="entity_address" value={invoice.entity_address}
+              onChange={this.handleChange} cols="40" rows="2" />
           </div>
           <div>
             <label>Your Client</label>

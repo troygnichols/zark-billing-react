@@ -23,6 +23,10 @@ class InvoiceList extends Component {
       });
   }
 
+  paidStyle(paid) {
+    return paid ? {} : {color: 'red'};
+  }
+
   buildInvoices(data) {
     return data.invoices.map((invoice) => {
       const paid = invoice.paid_date ? 'Yes' : 'No';
@@ -35,7 +39,7 @@ class InvoiceList extends Component {
           <td className="hidesmall">{invoice.due_date}</td>
           <td className="hidesmall">{invoice.subject}</td>
           <td className="hidesmall">{invoice.notes}</td>
-          <td className="hidesmall">{paid}</td>
+          <td style={this.paidStyle(invoice.paid_date)} className="hidesmall">{paid}</td>
           <td>
             <Link to={`/invoices/${invoice.id}`}>View</Link>
           </td>

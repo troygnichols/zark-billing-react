@@ -17,7 +17,6 @@ class App extends Component {
             <div className="container clearfix">
               <ul className="main-nav">
                 <li><Link to='/invoices'>Home</Link></li>
-                <li><a href="https://www.google.com">Google</a></li>
               </ul>
               <ul className="login-nav">
                 <li><a href="javascript:alert('TODO');">Login</a></li>
