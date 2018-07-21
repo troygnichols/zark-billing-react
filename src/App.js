@@ -6,6 +6,7 @@ import { Switch, Route, Redirect, Link } from 'react-router-dom';
 import InvoiceList from './InvoiceList.js';
 import Invoice from './Invoice.js';
 import EditInvoice from './EditInvoice.js';
+import NewInvoice from './NewInvoice.js';
 
 class App extends Component {
 
@@ -29,6 +30,7 @@ class App extends Component {
             <Switch>
               <Redirect exact from='/' to='/invoices' />
               <Route exact path='/invoices' component={InvoiceList} />
+              <Route exact path='/invoices/new' component={NewInvoice} />
               <Route exact path='/invoices/:id' component={Invoice} />
               <Route exact path='/invoices/:id/edit' component={EditInvoice} />
             </Switch>

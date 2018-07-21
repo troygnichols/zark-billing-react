@@ -52,25 +52,32 @@ class InvoiceList extends Component {
 
   render() {
     return (
-      <table className="invoice-list-table">
-        <thead>
-          <tr>
-            <th>Invoice ID</th>
-            <th className="hidesmall">Your Business</th>
-            <th>Client</th>
-            <th>Issued</th>
-            <th className="hidesmall">Due</th>
-            <th className="hidesmall">Subject</th>
-            <th className="hidesmall">Notes</th>
-            <th className="hidesmall">Paid?</th>
-            <th>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.state.invoices}
-        </tbody>
-      </table>
+      <div>
+        <table className="invoice-list-table">
+          <thead>
+            <tr>
+              <th>Invoice ID</th>
+              <th className="hidesmall">Your Business</th>
+              <th>Client</th>
+              <th>Issued</th>
+              <th className="hidesmall">Due</th>
+              <th className="hidesmall">Subject</th>
+              <th className="hidesmall">Notes</th>
+              <th className="hidesmall">Paid?</th>
+              <th>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.invoices}
+          </tbody>
+        </table>
+        <div className="clearfix">
+          <Link style={{float: 'right'}}to="/invoices/new" className="button">New Invoice</Link>
+        </div>
+        <br/>
+        <br/>
+      </div>
     );
   }
 }

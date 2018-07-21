@@ -10,7 +10,26 @@ export function calcTotalAmount(invoice) {
   ), 0);
 }
 
+export function buildInvoicePayload(invoice, itemIdsToDelete) {
+  const itemAttrs = Object.keys(invoice.items||{}).map((key) => {
+    const item = invoice.items[key];
+    return item;
+  }).concat([...(itemIdsToDelete||[])].map(id => (
+    {id, _destroy: true}
+  )));
+  const payload = {
+    invoice: {
+      ...invoice,
+      ...{ items_attributes: itemAttrs
+      }
+    }
+  };
+  delete payload.invoice.items;
+  return JSON.stringify(payload);
+}
+
 export default {
   calcAmount,
-  calcTotalAmount
+  calcTotalAmount,
+  buildInvoicePayload
 };

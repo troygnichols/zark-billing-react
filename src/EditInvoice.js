@@ -19,6 +19,12 @@ class EditInvoice extends Component {
         items: {}
       },
       itemIdsToDelete: new Set()
+      /*
+       * instead of ^^^^^^^, make an initial list of item ids and and
+       * when submitting, calculate the ones that are gone and add them
+       * to the delete array. that way the child form component doesn't
+       * need to communicate so much info back and forth with this one.
+      */
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -191,7 +197,6 @@ class EditInvoice extends Component {
         </tr>
       );
     })
-
   }
 
   render() {
