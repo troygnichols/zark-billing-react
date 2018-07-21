@@ -10,7 +10,7 @@ const config = {
 
   production: {
     api: {
-      baseUrl: ''
+      baseUrl: 'https://zark-billing-api.herokuapp.com'
     }
   }
 
