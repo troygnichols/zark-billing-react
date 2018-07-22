@@ -3,6 +3,7 @@ import { withRouter, Link } from 'react-router-dom';
 import InvoiceForm from './InvoiceForm.js';
 import { getConfig } from './config.js';
 import { buildInvoicePayload } from './util.js';
+import { getAuthToken } from './auth.js';
 
 class NewInvoice extends Component {
 
@@ -26,13 +27,18 @@ class NewInvoice extends Component {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': getAuthToken()
       },
       body: buildInvoicePayload(this.state.invoice)
     })
       .then(resp => resp.json())
       .then(data => {
-        history.push(`/invoices/${data.invoice.id}`);
+        if (data.error) {
+          history.push('/login');
+        } else {
+          history.push(`/invoices/${data.invoice.id}`);
+        }
       });
   }
 

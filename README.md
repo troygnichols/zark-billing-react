@@ -1,10 +1,11 @@
 # TODO
 
-- auth
 - notification that save was successful
 - datatables
 - loading screening for heroku dyno wakeup
 - re-sort line items
+- user profile, store address
+- favicon
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 

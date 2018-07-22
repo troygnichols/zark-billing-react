@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 
 import { getConfig } from './config.js';
 
+import { getAuthToken, isLoggedIn } from './auth.js';
+
 import './InvoiceList.css';
 
 class InvoiceList extends Component {
@@ -15,13 +17,33 @@ class InvoiceList extends Component {
     };
   }
 
+  componentWillMount() {
+    if (!isLoggedIn()) {
+      this.props.history.push('/login');
+    }
+  }
+
   componentDidMount() {
-    fetch(`${getConfig('api.baseUrl')}/invoices`)
+    const token = getAuthToken();
+    console.log('token', token);
+    const history = this.props.history;
+    fetch(`${getConfig('api.baseUrl')}/invoices`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': getAuthToken()
+      }
+    })
       .then(resp => resp.json())
       .then((data) => {
-        this.setState({
-          invoices: this.buildInvoices(data)
-        });
+        if (data.error) {
+          history.push('/login');
+        } else {
+          this.setState({
+            invoices: this.buildInvoices(data)
+          });
+        }
       });
   }
 

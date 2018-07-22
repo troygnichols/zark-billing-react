@@ -7,8 +7,21 @@ import InvoiceList from './InvoiceList.js';
 import Invoice from './Invoice.js';
 import EditInvoice from './EditInvoice.js';
 import NewInvoice from './NewInvoice.js';
+import Login from './Login.js';
+
+import { isLoggedIn, logout } from './auth.js';
 
 class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.handleLogout = this.handleLogout.bind(this);
+  }
+
+  handleLogout() {
+    logout();
+    window.location = '/login';
+  }
 
   render() {
     return (
@@ -20,15 +33,15 @@ class App extends Component {
                 <li><Link to='/invoices'>Home</Link></li>
               </ul>
               <ul className="login-nav">
-                <li><a href="#login">Login</a></li>
-                <li><a href="#logout">Logout</a></li>
-                <li><a href="#profile">User</a></li>
+                {isLoggedIn() ? <li><a href="#profile">Profile</a></li> : null}
+                {isLoggedIn() ? <li><a href="#logout" onClick={this.handleLogout}>Log Out</a></li> : null}
               </ul>
             </div>
           </header>
           <div className="container">
             <Switch>
               <Redirect exact from='/' to='/invoices' />
+              <Route exact path='/login' component={Login} />
               <Route exact path='/invoices' component={InvoiceList} />
               <Route exact path='/invoices/new' component={NewInvoice} />
               <Route exact path='/invoices/:id' component={Invoice} />

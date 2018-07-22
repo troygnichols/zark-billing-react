@@ -5,6 +5,7 @@ import blobStream from 'blob-stream';
 import { calcAmount, calcTotalAmount } from './util';
 import './Invoice.css';
 import { getConfig } from './config.js';
+import { getAuthToken } from './auth.js';
 
 class Invoice extends Component {
 
@@ -19,12 +20,24 @@ class Invoice extends Component {
 
   componentDidMount() {
     const id = this.props.match.params.id;
-    fetch(`${getConfig('api.baseUrl')}/invoices/${id}`)
+    const history = this.props.history;
+    fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': getAuthToken()
+      }
+    })
       .then(resp => resp.json())
       .then((data) => {
-        this.setState({
-          invoice: data.invoice
-        });
+        if (data.error) {
+          history.push('/login');
+        } else {
+          this.setState({
+            invoice: data.invoice
+          });
+        }
       });
   }
 
@@ -48,7 +61,8 @@ class Invoice extends Component {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Authorization': getAuthToken()
         }
       })
         .then(resp => resp.json)

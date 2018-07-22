@@ -4,6 +4,7 @@ import { buildInvoicePayload } from './util';
 import { getConfig } from './config.js';
 import difference from 'lodash.difference';
 import InvoiceForm from './InvoiceForm.js';
+import { getAuthToken } from './auth.js';
 
 class EditInvoice extends Component {
 
@@ -28,16 +29,28 @@ class EditInvoice extends Component {
 
   componentDidMount() {
     const id = this.props.match.params.id;
-    fetch(`${getConfig('api.baseUrl')}/invoices/${id}`)
+    const history = this.props.history;
+    fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': getAuthToken()
+      }
+    })
       .then(resp => resp.json())
       .then((data) => {
-        this.setState((prevState) => (
-          {
-            ...prevState,
-            invoice: data.invoice,
-            originalItemIds: (data.invoice.items || []).map(item => (item.id))
-          }
-        ));
+        if (data.error) {
+          history.push('/login');
+        } else {
+          this.setState((prevState) => (
+            {
+              ...prevState,
+              invoice: data.invoice,
+              originalItemIds: (data.invoice.items || []).map(item => (item.id))
+            }
+          ));
+        }
       });
   }
 
@@ -54,7 +67,8 @@ class EditInvoice extends Component {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': getAuthToken()
       },
       body: buildInvoicePayload(this.state.invoice, idsToDel)
     })
