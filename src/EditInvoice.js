@@ -97,10 +97,10 @@ class EditInvoice extends Component {
         </nav>
         <h1>Edit Invoice</h1>
         <InvoiceForm invoice={this.state.invoice} onChange={this.handleChange} />
-        <a href="#save" className="button" onClick={this.handleSubmit}>Save</a>
-        <Link to={`/invoices/${invoice.id}`} className="cancel button">Cancel</Link>
-        <br/>
-        <br/>
+        <div className="action-controls">
+          <a href="#save" className="button" onClick={this.handleSubmit}>Save</a>
+          <Link to={`/invoices/${invoice.id}`} className="cancel button">Cancel</Link>
+        </div>
       </div>
     );
   }

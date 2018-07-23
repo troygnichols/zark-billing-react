@@ -158,15 +158,13 @@ class Invoice extends Component {
         {this.state.document}
 
         <hr/>
-        <div className="clearfix">
+        <div className="clearfix action-controls">
           <div style={{float: 'left'}}>
             <Link to={`/invoices/${invoice.id}/edit`} className="button">Edit Invoice</Link>
             <a href="#pdf" onClick={this.handleGeneratePdf} className="action button">Generate PDF</a>
           </div>
           <a style={{float: 'right'}} href="#del" onClick={this.handleDeleteInvoice} className="delete button">✖ Delete Invoice</a>
         </div>
-        <br/>
-        <br/>
       </div>
     );
   }

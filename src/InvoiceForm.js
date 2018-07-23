@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { calcAmount } from './util.js';
+import './InvoiceForm.css';
 
 class InvoiceForm extends Component {
 
@@ -112,7 +113,7 @@ class InvoiceForm extends Component {
   render() {
     const invoice = this.props.invoice;
     return (
-      <form className="edit-form">
+      <form className="invoice-form">
         <div>
           <label>Your Business</label>
           <input type="text" name="entity_name" required autoFocus
@@ -183,8 +184,7 @@ class InvoiceForm extends Component {
             {this.renderLineItems()}
           </tbody>
         </table>
-        <br/>
-        <button onClick={this.handleAddLineItem}>New Line Item</button>
+        <a href="#new-line-item" className="new-line-item" onClick={this.handleAddLineItem}>&#65291; New Line Item</a>
         <hr/>
       </form>
     );

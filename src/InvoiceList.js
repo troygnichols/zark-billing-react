@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import './App.css';
-
-import { Link } from 'react-router-dom';
-
-import { getConfig } from './config.js';
-
-import { getAuthToken, isLoggedIn } from './auth.js';
-
 import './InvoiceList.css';
+import { Link } from 'react-router-dom';
+import { getConfig } from './config.js';
+import { getAuthToken, isLoggedIn } from './auth.js';
+import ReactTable from "react-table";
+import 'react-table/react-table.css';
+import SimpleTable from './SimpleTable.js';
+import { calcAmount, calcTotalAmount } from './util.js';
 
 class InvoiceList extends Component {
   constructor() {
@@ -24,8 +24,6 @@ class InvoiceList extends Component {
   }
 
   componentDidMount() {
-    const token = getAuthToken();
-    console.log('token', token);
     const history = this.props.history;
     fetch(`${getConfig('api.baseUrl')}/invoices`, {
       method: 'GET',
@@ -41,7 +39,7 @@ class InvoiceList extends Component {
           history.push('/login');
         } else {
           this.setState({
-            invoices: this.buildInvoices(data)
+            invoices: data.invoices
           });
         }
       });
@@ -51,54 +49,86 @@ class InvoiceList extends Component {
     return paid ? {} : {color: 'red'};
   }
 
-  buildInvoices(data) {
-    return data.invoices.map((invoice) => {
-      const paid = invoice.paid_date ? 'Yes' : 'No';
-      return (
-        <tr key={invoice.id}>
-          <td>{invoice.invoice_id}</td>
-          <td className="hidesmall">{invoice.entity_name}</td>
-          <td>{invoice.client_name}</td>
-          <td>{invoice.issue_date}</td>
-          <td className="hidesmall">{invoice.due_date}</td>
-          <td className="hidesmall">{invoice.subject}</td>
-          <td className="hidesmall">{invoice.notes}</td>
-          <td style={this.paidStyle(invoice.paid_date)} className="hidesmall">{paid}</td>
-          <td>
-            <Link to={`/invoices/${invoice.id}`}>View</Link>
-          </td>
-        </tr>
-      );
-    });
-  }
-
   render() {
+    const paidStyle = this.paidStyle;
+    const missing = (msg) => <em>{msg}</em>;
+
     return (
-      <div>
-        <table className="invoice-list-table">
-          <thead>
-            <tr>
-              <th>Invoice ID</th>
-              <th className="hidesmall">Your Business</th>
-              <th>Client</th>
-              <th>Issued</th>
-              <th className="hidesmall">Due</th>
-              <th className="hidesmall">Subject</th>
-              <th className="hidesmall">Notes</th>
-              <th className="hidesmall">Paid?</th>
-              <th>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.invoices}
-          </tbody>
-        </table>
-        <div className="clearfix">
-          <Link style={{float: 'right'}}to="/invoices/new" className="button">New Invoice</Link>
+      <div className="invoice-list-container">
+        <ReactTable data={this.state.invoices}
+          columns={[
+            { Header: 'ID', accessor: 'invoice_id' },
+            { Header: 'Name', accessor: 'entity_name' },
+            { Header: 'Client', accessor: 'client_name' },
+            { Header: 'Issued', accessor: 'issue_date' },
+            { Header: 'Due', accessor: 'due_date' },
+            {
+              Header: 'Paid?', accessor: 'paid_date',
+              Cell: props =>
+                <span style={paidStyle(props.value)}>{
+                  props.value ? 'Yes' : 'No'}</span>,
+              filterMethod: (filter, row) => {
+                switch (filter.value) {
+                  case 'paid':
+                    return !!row[filter.id];
+                  case 'unpaid':
+                    return !row[filter.id];
+                  default:
+                    return true;
+                }
+              },
+              Filter: ({filter, onChange}) =>
+                <select onChange={(event) => onChange(event.target.value)}
+                  style={{width: '100%', height: '100%'}}>
+                  <option value="all"></option>
+                  <option value="paid">Paid</option>
+                  <option value="unpaid">Unpaid</option>
+                </select>
+            },
+            {
+              accessor: 'id', Cell: props =>
+                <Link to={`/invoices/${props.value}`}>More...</Link>,
+              Filter: () => null
+            }
+          ]}
+          filterable
+          defaultFilterMethod={(filter, row) => (
+            String(row[filter.id]).toLowerCase().includes(
+              String(filter.value).toLowerCase())
+          )}
+          defaultPageSize={10}
+          className="-striped -highlight invoice-list-table"
+          SubComponent={({original: invoice}) => {
+            const {subject, notes, items, paid_date} = invoice;
+            return (
+              <div className="details">
+                <h4>Subject</h4>
+                <p>{subject || missing('No subject')}</p>
+                <h4>Notes</h4>
+                <p>{notes || missing('No notes')}</p>
+                <h4>Line Items</h4>
+                {items.length
+                    ?
+                    <div>
+                      <SimpleTable className="item-table" data={items} columns={[
+                        { Header: 'Description', accessor: 'description' },
+                        { Header: 'Qty', accessor: 'quantity' },
+                        { Header: 'Unit $', accessor: 'unit_price' },
+                        { Header: 'Amount $', fn: (item) => calcAmount(item) },
+                      ]} />
+                  </div>
+                    : <p>{missing('No line items')}</p>
+                }
+                <h4>{paid_date ? 'Amount Paid' : 'Amount Due'}:&nbsp;
+                  ${calcTotalAmount(invoice)}</h4>
+              </div>
+            );
+          }}
+        />
+        <div className="clearfix action-controls">
+          <Link style={{float: 'right'}}to="/invoices/new"
+            className="button">New Invoice</Link>
         </div>
-        <br/>
-        <br/>
       </div>
     );
   }

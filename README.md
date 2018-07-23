@@ -2,10 +2,13 @@
 
 - notification that save was successful
 - datatables
-- loading screening for heroku dyno wakeup
+- loading screen for heroku dyno wakeup
 - re-sort line items
 - user profile, store address
 - favicon
+- autocomplete client name
+- auto generate incrementing invoice id per client
+- BUG: navigate after token expired weird behavior, e.g. route to /invoices/undefined
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 

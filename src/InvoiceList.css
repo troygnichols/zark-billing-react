@@ -1,10 +1,35 @@
-table.invoice-list-table {
+.invoice-list-table {
+  /* margin: 2em 0; */
+  background-color: #fff;
+  color: #505050;
+}
+
+.invoice-list-table .rt-td a {
+  color: blue;
+}
+
+.invoice-list-container .details {
+  padding: 1em;
+}
+
+.invoice-list-container .details h4:first-child {
+  margin-top: 0;
+}
+.invoice-list-container .details h4 {
+  margin: 1em 0 .5em 0;
+}
+
+.invoice-list-container .details p {
+  margin: 0 0 1em 0;
+  font-size: 12px;
+}
+
+.invoice-list-container .details .item-table th,
+.invoice-list-container .details .item-table td {
+  border: 1px solid rgba(0,0,0,0.1);
+  padding: .3em;
+}
+
+.invoice-list-container {
   margin: 2em 0;
 }
-
-table.invoice-list-table th,
-table.invoice-list-table td {
-  padding: .6em;
-  border: 3px solid black;
-}
-

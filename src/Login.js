@@ -75,8 +75,9 @@ class Login extends Component {
               value={this.state.password} onChange={this.handleChange}/>
           </div>
         </form>
-        <br/>
-        <a href="#login" onClick={this.login} className="button">Login</a>
+        <div className="action-controls">
+          <a href="#login" onClick={this.login} className="button">Login</a>
+        </div>
       </div>
     );
   }
