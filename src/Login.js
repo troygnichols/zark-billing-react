@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { getConfig } from './config';
 import Message from './Message.js';
-import { storeAuthToken } from './auth.js';
+import { storeAuthToken } from './lib/auth.js';
+import './styles/Login.css';
 
 class Login extends Component {
 
@@ -13,10 +14,11 @@ class Login extends Component {
     };
 
     this.handleChange = this.handleChange.bind(this);
-    this.login = this.login.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
   }
 
-  login() {
+  handleLogin(event) {
+    event.preventDefault();
     const self = this;
     const handleBadCreds = () => {
       self.setState(prevState => (
@@ -34,14 +36,16 @@ class Login extends Component {
         password: this.state.password
       })
     })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.auth_token) {
-          storeAuthToken(data.auth_token);
-          self.props.history.push('/invoices');
-        } else {
-          handleBadCreds();
+      .then(resp => {
+        if (resp.ok) {
+          return resp.json();
         }
+        console.error('Server gave bad response to login request', resp);
+        throw new Error('Login failed');
+      })
+      .then(({auth_token}) => {
+        storeAuthToken(auth_token);
+        self.props.history.push('/invoices');
       })
       .catch(handleBadCreds);
   }
@@ -60,23 +64,32 @@ class Login extends Component {
 
   render() {
     return (
-      <div>
-        <h1>Login</h1>
-        <Message if={this.state.loginFailed}>Bad username/password</Message>
-        <form onSubmit={this.login}>
-          <div>
-            <label>Email</label><br/>
-            <input autoFocus type="text" name="email"
-              value={this.state.email} onChange={this.handleChange}/>
+      <div className="login-form">
+        <h1 className="title">Login</h1>
+        <Message danger if={this.state.loginFailed}>Bad username/password</Message>
+        <div className="card">
+          <div className="card-content">
+            <form onSubmit={this.handleLogin}>
+              <div className="field">
+                <label className="label">Email</label>
+                <div className="control">
+                  <input className="input" autoFocus type="text" name="email"
+                    value={this.state.email} onChange={this.handleChange}/>
+                </div>
+              </div>
+              <div className="field">
+                <label className="label">Password</label>
+                <input type="password" name="password"
+                  value={this.state.password} onChange={this.handleChange}
+                  className="input"/>
+              </div>
+              <div className="control is-clearfix">
+                <button type="submit"
+                  className="button is-primary has-text-weight-bold is-pulled-right">
+                  <span>Login</span></button>
+              </div>
+            </form>
           </div>
-          <div>
-            <label>Password</label><br/>
-            <input type="password" name="password"
-              value={this.state.password} onChange={this.handleChange}/>
-          </div>
-        </form>
-        <div className="action-controls">
-          <a href="#login" onClick={this.login} className="button">Login</a>
         </div>
       </div>
     );

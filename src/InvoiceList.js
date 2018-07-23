@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import './App.css';
-import './InvoiceList.css';
+import './styles/InvoiceList.css';
 import { Link } from 'react-router-dom';
 import { getConfig } from './config.js';
-import { getAuthToken, isLoggedIn } from './auth.js';
+import { getAuthToken, isLoggedIn } from './lib/auth.js';
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
 import SimpleTable from './SimpleTable.js';
-import { calcAmount, calcTotalAmount } from './util.js';
+import { calcAmount, calcTotalAmount } from './lib/util.js';
 
 class InvoiceList extends Component {
   constructor() {
@@ -54,7 +53,7 @@ class InvoiceList extends Component {
     const missing = (msg) => <em>{msg}</em>;
 
     return (
-      <div className="invoice-list-container">
+      <div>
         <ReactTable data={this.state.invoices}
           columns={[
             { Header: 'ID', accessor: 'invoice_id' },
@@ -125,9 +124,9 @@ class InvoiceList extends Component {
             );
           }}
         />
-        <div className="clearfix action-controls">
+        <div className="section">
           <Link style={{float: 'right'}}to="/invoices/new"
-            className="button">New Invoice</Link>
+            className="button">&#65291; New Invoice</Link>
         </div>
       </div>
     );

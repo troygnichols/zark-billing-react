@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import InvoiceForm from './InvoiceForm.js';
 import { getConfig } from './config.js';
-import { buildInvoicePayload } from './util.js';
-import { getAuthToken } from './auth.js';
+import { buildInvoicePayload } from './lib/util.js';
+import { getAuthToken } from './lib/auth.js';
 
 class NewInvoice extends Component {
 
@@ -46,19 +46,26 @@ class NewInvoice extends Component {
     const invoice = this.state.invoice;
     return (
       <div className="container">
-        <nav>
-          <ul className="breadcrumb">
+        <nav className="breadcrumb">
+          <ul>
             <li><Link to="/invoices">Invoices</Link></li>
             <li><Link to={`/invoices/${invoice.id}`}>Invoice {invoice.invoice_id}</Link></li>
-            <li>Edit Invoice</li>
+            <li className="is-active"><a href="#new">New Invoice</a></li>
           </ul>
         </nav>
         <InvoiceForm
           invoice={this.state.invoice}
           onChange={this.handleChange} />
-        <div className="action-controls">
-          <a href="#save" className="button" onClick={this.handleSubmit}>Save</a>
-          <Link to="/invoices" className="cancel button">Cancel</Link>
+
+        <hr/>
+        <div className="field is-grouped">
+          <div className="control">
+            <a href="#save" className="button is-link"
+              onClick={this.handleSubmit}>Save</a>
+          </div>
+          <div className="control">
+            <Link to="/invoices" className="cancel button">Cancel</Link>
+          </div>
         </div>
       </div>
     );

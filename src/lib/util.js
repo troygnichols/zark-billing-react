@@ -5,7 +5,7 @@ export function calcAmount(item) {
 
 
 export function calcTotalAmount(invoice) {
-  return invoice.items.reduce((acc, item) => (
+  return (invoice.items||[]).reduce((acc, item) => (
     acc + calcAmount(item)
   ), 0);
 }

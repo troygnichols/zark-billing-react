@@ -1,0 +1,15 @@
+.zark-notes h2 {
+  font-weight: bold;
+}
+
+.zark-notes-display p {
+  font-size: 12px;
+  display: inline-block;
+  margin: .5em 0 1em 0;
+}
+
+.zark-line-items h2 {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 1em;
+}

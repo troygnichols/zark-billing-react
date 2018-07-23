@@ -57,6 +57,7 @@
     "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
+    "setupTestFrameworkScriptFile": "<rootDir>/src/setupTests.js",
     "collectCoverageFrom": [
       "src/**/*.{js,jsx,mjs}"
     ],
