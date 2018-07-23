@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 
-import './styles/bulma/custom.css';
-import './styles/bulma/bulma.css';
+import './styles/bulma/bulma.cyborg-theme.css';
 import './styles/App.css';
 
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
@@ -34,7 +33,7 @@ class App extends Component {
             </div>
           </div>
 
-          <footer className="footer zark-footer">
+          <footer className="footer">
             <div className="container has-text-centered">
               <p>
                 The source code for this project is <strong><a href="https://github.com/troygnichols/zark-billing-react"

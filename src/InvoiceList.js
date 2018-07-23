@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import './styles/InvoiceList.css';
 import { Link } from 'react-router-dom';
 import { getConfig } from './config.js';
 import { getAuthToken, isLoggedIn } from './lib/auth.js';
 import ReactTable from "react-table";
 import 'react-table/react-table.css';
+import './styles/InvoiceList.css';
 import SimpleTable from './SimpleTable.js';
 import { calcAmount, calcTotalAmount } from './lib/util.js';
 
@@ -45,7 +45,7 @@ class InvoiceList extends Component {
   }
 
   paidStyle(paid) {
-    return paid ? {} : {color: 'red'};
+    return paid ? {color: 'rgb(153, 204, 51)'} : {color: 'red'};
   }
 
   render() {
@@ -54,7 +54,9 @@ class InvoiceList extends Component {
 
     return (
       <div>
+        <h1 className="title">Invoices</h1>
         <ReactTable data={this.state.invoices}
+          noDataText="No invoice found"
           columns={[
             { Header: 'ID', accessor: 'invoice_id' },
             { Header: 'Name', accessor: 'entity_name' },
@@ -86,7 +88,8 @@ class InvoiceList extends Component {
             },
             {
               accessor: 'id', Cell: props =>
-                <Link to={`/invoices/${props.value}`}>More...</Link>,
+                <Link to={`/invoices/${props.value}`}
+                  style={{fontWeight: 'bold'}}>More&#8230;</Link>,
               Filter: () => null
             }
           ]}

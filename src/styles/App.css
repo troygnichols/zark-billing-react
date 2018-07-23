@@ -3,27 +3,17 @@
   src: url("../fonts/OCRA.otf") format("opentype");
 }
 
-.App {
-  /* font-family: OCRA; */
-}
-
 .logo-image {
   margin-right: .6em;
   max-height: 60px !important;
 }
 
-.zark-footer {
-  background-color: rgba(0,0,0,0.05);
-}
-
-.zark-footer a {
-  /* color: light-blue; */
-}
 
 .zark-navbar {
-  background-color: rgba(0,0,0,0.05);
+  background-color: #363636;
 }
 
-.zark-navbar a {
+.zark-navbar a,
+.zark-navbar button {
   font-weight: bold;
 }

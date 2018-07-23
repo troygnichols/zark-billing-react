@@ -1,0 +1,50 @@
+.invoice-list-table .pagination-bottom button {
+  color: #dfdfdf !important;
+}
+
+.invoice-list-table .rt-th,
+.invoice-list-table .rt-td,
+.invoice-list-table tbody .rt-th,
+.invoice-list-table tbody .rt-td {
+  border-right: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.invoice-list-table .rt-thead .rt-th.-sort-asc,
+.invoice-list-table .rt-thead .rt-td.-sort-asc {
+  box-shadow: inset 0 3px 0 0 rgb(50,115,226,.6);
+}
+
+.invoice-list-table .rt-thead .rt-th.-sort-desc,
+.invoice-list-table .rt-thead .rt-td.-sort-desc {
+  box-shadow: inset 0 -3px 0 0 rgb(50,115,226,.6);
+}
+
+.invoice-list-table {
+  background-color: #363636;
+}
+
+.invoice-list-table .rt-tr.-even {
+  background-color: #4a4a4a;
+}
+
+.invoice-list-table .details {
+  padding: 1em;
+}
+
+.invoice-list-table .details h4:first-child {
+  margin-top: 0;
+}
+.invoice-list-table .details h4 {
+  margin: 1em 0 .5em 0;
+}
+
+.invoice-list-table .details p {
+  margin: 0 0 1em 0;
+  font-size: 12px;
+}
+
+.invoice-list-table .details .item-table th,
+.invoice-list-table .details .item-table td {
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: .3em;
+}
