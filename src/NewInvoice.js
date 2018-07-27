@@ -3,14 +3,18 @@ import { withRouter, Link } from 'react-router-dom';
 import InvoiceForm from './InvoiceForm.js';
 import { getConfig } from './config.js';
 import { buildInvoicePayload } from './lib/util.js';
-import { getAuthToken } from './lib/auth.js';
+import { getAuthToken, getUserProfile } from './lib/auth.js';
 
 class NewInvoice extends Component {
 
   constructor(props) {
     super(props);
+    const profile = getUserProfile();
     this.state = {
-      invoice: {},
+      invoice: {
+        entity_name: profile.name,
+        entity_address: profile.address
+      },
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);

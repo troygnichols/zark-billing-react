@@ -22,8 +22,10 @@ class NavBar extends Component {
       <nav className=" navbar has-shadow is-spaced zark-navbar">
         <div className="container">
           <div className="navbar-brand">
-            <img className="logo-image" alt="" src={orangeCatImg} />
-            <p style={{marginTop: 12, fontSize: 20}}>Zark Billing</p>
+            <Link to="/" className="navbar-item">
+              <img className="logo-image" alt="" src={orangeCatImg} />
+              <p style={{fontWeight: 'bold', fontSize: 20}}>Zark Billing</p>
+            </Link>
           </div>
           <div className="navbar-end">
             <div className="navbar-item">
@@ -31,7 +33,7 @@ class NavBar extends Component {
                 <p className="control">
                   {isLoggedIn() ?
                       <Link className="button is-primary"
-                        to="/invoices">Profile</Link>
+                        to="/profile">Profile</Link>
                       : null}
                 </p>
                 <p className="control">

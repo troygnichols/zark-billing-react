@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { getConfig } from './config';
 import Message from './Message.js';
-import { storeAuthToken } from './lib/auth.js';
+import { storeAuthToken, storeUserProfile } from './lib/auth.js';
 import './styles/Login.css';
+import { Link } from 'react-router-dom';
 
 class Login extends Component {
 
@@ -33,7 +34,8 @@ class Login extends Component {
       },
       body: JSON.stringify({
         email: this.state.email,
-        password: this.state.password
+        password: this.state.password,
+        include_profile: true
       })
     })
       .then(resp => {
@@ -43,8 +45,9 @@ class Login extends Component {
         console.error('Server gave bad response to login request', resp);
         throw new Error('Login failed');
       })
-      .then(({auth_token}) => {
+      .then(({auth_token, profile}) => {
         storeAuthToken(auth_token);
+        storeUserProfile(profile);
         self.props.history.push('/invoices');
       })
       .catch(handleBadCreds);
@@ -52,11 +55,7 @@ class Login extends Component {
 
   handleChange(event) {
     event.preventDefault();
-
-    const target = event.target;
-    const name = target.name;
-    const value = target.value;
-
+    const {target: {name, value}} = event;
     this.setState((prevState) => (
       { ...prevState, [name]: value }
     ));
@@ -83,10 +82,13 @@ class Login extends Component {
                   value={this.state.password} onChange={this.handleChange}
                   className="input"/>
               </div>
-              <div className="control is-clearfix">
-                <button type="submit"
-                  className="button is-primary has-text-weight-bold is-pulled-right">
-                  <span>Login</span></button>
+              <div className="is-clearfix">
+                <Link to="reset_password" className="is-pulled-left">Forgot password</Link>
+                <div className="control">
+                  <button type="submit"
+                    className="button is-primary has-text-weight-bold is-pulled-right">
+                    <span>Login</span></button>
+                </div>
               </div>
             </form>
           </div>

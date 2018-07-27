@@ -5,6 +5,7 @@ import { getConfig } from './config.js';
 import difference from 'lodash.difference';
 import InvoiceForm from './InvoiceForm.js';
 import { getAuthToken } from './lib/auth.js';
+import { toast } from 'react-toastify';
 
 class EditInvoice extends Component {
 
@@ -72,8 +73,9 @@ class EditInvoice extends Component {
       },
       body: buildInvoicePayload(this.state.invoice, idsToDel)
     })
-      .then(resp => resp.json)
+      .then(resp => resp.json())
       .then(data => {
+        toast.success('Invoice saved');
         history.push(`/invoices/${invoice.id}`);
       });
   }
