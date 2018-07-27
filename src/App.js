@@ -20,9 +20,6 @@ import 'react-toastify/dist/ReactToastify.css';
 class App extends Component {
 
   render() {
-    // XXX temp
-    console.log('deleteme');
-
     return (
       <BrowserRouter className="App">
         <div className="App">
