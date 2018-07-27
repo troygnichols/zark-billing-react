@@ -44,7 +44,7 @@ class ChangePassword extends Component {
       switch(resp.status) {
         case 200:
           toast.success('Changed password successfully.');
-          this.props.history.push('/profile');
+          history.push('/profile');
           break;
         case 401:
           history.push('/login');
