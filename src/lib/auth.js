@@ -15,7 +15,7 @@ export function getAuthToken() {
 
 export function getUserProfile() {
   try {
-    return JSON.parse(localStorage.getItem(PROFILE_KEY));
+    return JSON.parse(localStorage.getItem(PROFILE_KEY)) || {};
   } catch (error) {
     console.error('Error reading local user data', error);
     return {};

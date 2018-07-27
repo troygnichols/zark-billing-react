@@ -4,7 +4,7 @@ import { withRouter, Link } from 'react-router-dom';
 import InvoiceForm from './InvoiceForm.js';
 import { getConfig } from './config.js';
 import { buildInvoicePayload } from './lib/util.js';
-import { getAuthToken, getUserProfile } from './lib/auth.js';
+import { getAuthToken, getUserProfile, isLoggedIn } from './lib/auth.js';
 import { toast } from 'react-toastify';
 import ModalError from './ModalError.js';
 
@@ -12,11 +12,11 @@ class NewInvoice extends Component {
 
   constructor(props) {
     super(props);
-    const profile = getUserProfile();
+    const {name, address} = getUserProfile();
     this.state = {
       invoice: {
-        entity_name: profile.name,
-        entity_address: profile.address
+        entity_name: name,
+        entity_address: address
       },
     };
   }
@@ -24,6 +24,13 @@ class NewInvoice extends Component {
   handleChange = (invoice) => {
     this.setState((prevState) => ({...prevState, invoice: invoice}));
   };
+
+  componentDidMount() {
+    const { history } = this.props;
+    if (!isLoggedIn()) {
+      history.push('/login');
+    }
+  }
 
   handleSubmit = (event) => {
     event.preventDefault();
