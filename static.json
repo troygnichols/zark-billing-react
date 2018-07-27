@@ -3,5 +3,10 @@
   "https_only": true,
   "routes": {
     "/**": "index.html"
+  },
+  "headers": {
+    "/**": {
+      "Cache-Control": "no-store, no-cache"
+    }
   }
 }
