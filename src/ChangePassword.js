@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import './Profile.css';
 import { getConfig } from './config.js';
 import { getAuthToken } from './lib/auth.js';
 import Message from './Message.js';
-import titleize from 'titleize';
-import { humanize } from 'inflection';
 import { toast } from 'react-toastify';
+import { getErrorMessages } from './lib/util.js';
+import ModalError from './ModalError.js';
 
 class ChangePassword extends Component {
 
@@ -16,14 +15,11 @@ class ChangePassword extends Component {
       fields: {
         password: '',
         password_confirmation: ''
-      },
-      errors: {},
+      }
     };
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) {
+  handleChange = (event) => {
     event.preventDefault();
     const {target: {name, value}} = event;
     this.setState((prevState) => (
@@ -31,10 +27,11 @@ class ChangePassword extends Component {
         { ...prevState.fields, [name]: value }
       }
     ));
-  }
+  };
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
+    const { history } = this.props;
     fetch(`${getConfig('api.baseUrl')}/update_password`, {
       method: 'PATCH',
       headers: {
@@ -43,43 +40,49 @@ class ChangePassword extends Component {
         'Authorization': getAuthToken()
       },
       body: JSON.stringify(this.state.fields)
-    })
-      .then(resp => {
-        if (resp.ok) {
-          return new Promise(resolve => resolve(null));
-        } else {
-          return resp.json()
-        }
-      })
-      .then(errors => {
-        if (errors) {
-          this.setState(prevState => (
-            { ...prevState, errors: errors }
-          ));
-        } else {
+    }).then(resp => {
+      switch(resp.status) {
+        case 200:
           toast.success('Changed password successfully.');
           this.props.history.push('/profile');
-        }
+          break;
+        case 401:
+          history.push('/login');
+          break;
+        case 422:
+          resp.json().then((errors) => this.setState({errors}));
+          break;
+        default:
+          console.error('Update password failed', resp);
+          this.setState({
+            modalError: 'Server error, could not update password!'
+          });
+      }
+    }).catch(err => {
+      console.error('Communication error', err);
+      this.setState({
+        modalError: 'There was a problem communicating with the server!'
       });
-  }
-
-  getErrorMessages() {
-    const errors = this.state.errors;
-    const keys = Object.keys(errors);
-    if (keys.length === 0) {
-      return [];
-    }
-    return keys.reduce((acc, key) => (
-      acc.concat(errors[key].map(msg => (
-        `${titleize(humanize(key))} ${msg}`
-      )))
-    ), []);
-  }
+    });
+  };
 
   render() {
-    const errors = this.getErrorMessages();
+    const {
+      errors, modalError, password, password_confirmation
+    } = this.state;
+    const errMsgs = getErrorMessages(errors);
+
     return (
       <div>
+        <ModalError if={modalError}>
+          <p className="has-text-centered">
+            {modalError}
+          </p>
+          <p className="has-text-centered">
+            <a className="button"
+              onClick={() => window.location.reload()}>Reload page</a>
+          </p>
+        </ModalError>
         <nav className="breadcrumb">
           <ul>
             <li><Link to="/">Home</Link></li>
@@ -87,8 +90,8 @@ class ChangePassword extends Component {
             <li className="is-active"><a href="#profile">Change Password</a></li>
           </ul>
         </nav>
-        <Message danger if={errors.length}>
-          {errors.map((msg, i) => (
+        <Message danger if={errMsgs.length}>
+          {errMsgs.map((msg, i) => (
             <div key={i}>{msg}</div>
           ))}
         </Message>
@@ -99,7 +102,7 @@ class ChangePassword extends Component {
                 <label className="label">Password</label>
                 <div className="control">
                   <input className="input" type="password" name="password"
-                    value={this.state.password} onChange={this.handleChange}/>
+                    value={password} onChange={this.handleChange}/>
                 </div>
               </div>
               <div className="field">
@@ -107,7 +110,7 @@ class ChangePassword extends Component {
                 <div className="control">
                   <input className="input" type="password"
                     name="password_confirmation"
-                    value={this.state.password_confirmation}
+                    value={password_confirmation}
                     onChange={this.handleChange}/>
                 </div>
               </div>

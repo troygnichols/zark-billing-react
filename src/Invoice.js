@@ -7,6 +7,9 @@ import './styles/Invoice.css';
 import { getConfig } from './config.js';
 import { getAuthToken } from './lib/auth.js';
 import ModalConfirm from './ModalConfirm.js';
+import ModalLoading from './ModalLoading.js';
+import ModalError from './ModalError.js';
+import { toast } from 'react-toastify';
 
 class Invoice extends Component {
 
@@ -30,17 +33,28 @@ class Invoice extends Component {
         'Accept': 'application/json',
         'Authorization': getAuthToken()
       }
-    })
-      .then(resp => resp.json())
-      .then((data) => {
-        if (data.error) {
-          history.push('/login');
-        } else {
-          this.setState({
-            invoice: data.invoice
+    }).then(resp => {
+      switch(resp.status) {
+        case 200:
+          resp.json().then(({invoice}) => {
+            this.setState({ invoice, hasLoaded: true });
           });
-        }
+          break;
+        case 401:
+          history.push('/login');
+          break;
+        default:
+          console.error('Could not load invoices data', resp);
+          this.setState({
+            modalError: 'Server error, could not load invoices!'
+          });
+      }
+    }).catch(err => {
+      console.error('Communication error', err);
+      this.setState({
+        modalError: 'There was a problem communicating with the server!'
       });
+    });
   }
 
   handleGeneratePdf(event) {
@@ -62,8 +76,8 @@ class Invoice extends Component {
   }
 
   commitDelete() {
-    const id = this.state.invoice.id;
-    const history = this.props.history;
+    const { id } = this.state.invoice;
+    const { history } = this.props;
     fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
       method: 'DELETE',
       headers: {
@@ -71,23 +85,61 @@ class Invoice extends Component {
         'Accept': 'application/json',
         'Authorization': getAuthToken()
       }
-    })
-      .then(resp => resp.json)
-      .then(data => {
-        history.push('/invoices');
+    }).then(resp => {
+      switch(resp.status) {
+        case 200:
+        case 202:
+        case 204:
+          toast.success('Invoice successfully deleted');
+          history.push('/invoices');
+          break;
+        case 401:
+          history.push('/login');
+          break;
+        default:
+          console.error('Delete invoice failed', resp);
+          this.setState({
+            modalError: 'Server error, could not delete invoice!'
+          });
+      }
+    }).catch(err => {
+      console.error('Communication error', err);
+      this.setState({
+        modalError: 'There was a problem communicating with the server!'
       });
+    });
   }
 
-  renderLineItems() {
-    return ;
+  isLoading() {
+    const { modalError, hasLoaded } = this.state;
+    return !modalError && !hasLoaded;
+  }
+
+  showConfirmDeleteModal() {
+    const { modalError, showConfirmDeleteModal } = this.state;
+    return !modalError && showConfirmDeleteModal;
   }
 
   render() {
-    const invoice = this.state.invoice;
-    const totalStyle = { backgroundColor: '#99CC33', color: '#000', fontSize: '120%'};
+    const { invoice, modalError } = this.state
+
+    const totalStyle = {
+      backgroundColor: '#99CC33', color: '#000', fontSize: '120%'
+    };
+
     return (
       <div>
-        <ModalConfirm if={this.state.showConfirmDeleteModal}
+        <ModalError if={modalError}>
+          <p className="has-text-centered">
+            {modalError}
+          </p>
+          <p className="has-text-centered">
+            <a className="button"
+              onClick={() => window.location.reload()}>Reload page</a>
+          </p>
+        </ModalError>
+        <ModalLoading if={this.isLoading()} />
+        <ModalConfirm if={this.showConfirmDeleteModal()}
           title="Confirm Delete" confirmText="Yes, delete it"
           onConfirm={this.commitDelete}
           onCancel={() => {
@@ -109,10 +161,6 @@ class Invoice extends Component {
               <table className="table is-bordered is-striped is-fullwidth">
                 <tbody>
                   <tr>
-                    <td>Invoice ID</td>
-                    <td>{invoice.invoice_id}</td>
-                  </tr>
-                  <tr>
                     <td>Your Business</td>
                     <td>{invoice.entity_name}</td>
                   </tr>
@@ -126,20 +174,27 @@ class Invoice extends Component {
                     <td>{invoice.client_name}</td>
                   </tr>
                   <tr>
+                    <td>Invoice ID</td>
+                    <td>{invoice.invoice_id}</td>
+                  </tr>
+                  <tr>
                     <td>Issued On</td>
-                    <td>{invoice.issue_date}</td>
+                    <td>{invoice.issue_date || '--'}</td>
                   </tr>
                   <tr>
                     <td>Due On</td>
-                    <td>{invoice.due_date}</td>
+                    <td>{invoice.due_date || '--'}</td>
+                  </tr>
+                  <tr>
+                    <td>Payment</td>
+                    <td>{ invoice.paid_date
+                        ? invoice.paid_date
+                        : <em>Not paid</em>}
+                    </td>
                   </tr>
                   <tr>
                     <td>Subject</td>
                     <td>{invoice.subject}</td>
-                  </tr>
-                  <tr>
-                    <td>Payment</td>
-                    <td>{invoice.paid_date || 'Not paid'}</td>
                   </tr>
                 </tbody>
               </table>
@@ -148,7 +203,7 @@ class Invoice extends Component {
                 { invoice.notes ?
                     <div className="zark-notes-display">
                       <h2>Notes</h2>
-                      <p className="zark-notes-display">{invoice.notes}</p>
+                      <p>{invoice.notes}</p>
                     </div> : null
                 }
               </div>
@@ -167,7 +222,7 @@ class Invoice extends Component {
             </thead>
             <tbody>
               {
-                this.state.invoice.items.map(item => (
+                invoice.items.map(item => (
                   <tr key={item.id}>
                     <td>{item.description}</td>
                     <td>{item.quantity}</td>

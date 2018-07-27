@@ -1,3 +1,6 @@
+import titleize from 'titleize';
+import { humanize } from 'inflection';
+
 export function calcAmount(item) {
   const amt = parseInt(item.quantity, 10) * parseInt(item.unit_price, 10);
   return amt || 0;
@@ -26,6 +29,18 @@ export function buildInvoicePayload(invoice, itemIdsToDelete) {
   };
   delete payload.invoice.items;
   return JSON.stringify(payload);
+}
+
+export function getErrorMessages(errors = []) {
+  const keys = Object.keys(errors);
+  if (keys.length === 0) {
+    return [];
+  }
+  return keys.reduce((acc, key) => (
+    acc.concat(errors[key].map(msg => (
+      `${titleize(humanize(key))} ${msg}`
+    )))
+  ), []);
 }
 
 export default {

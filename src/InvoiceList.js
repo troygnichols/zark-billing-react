@@ -7,12 +7,13 @@ import 'react-table/react-table.css';
 import './styles/InvoiceList.css';
 import SimpleTable from './SimpleTable.js';
 import { calcAmount, calcTotalAmount } from './lib/util.js';
+import ModalError from './ModalError.js';
 
 class InvoiceList extends Component {
   constructor() {
     super();
     this.state = {
-      invoices: []
+      invoices: [],
     };
   }
 
@@ -31,32 +32,57 @@ class InvoiceList extends Component {
         'Accept': 'application/json',
         'Authorization': getAuthToken()
       }
-    })
-      .then(resp => resp.json())
-      .then((data) => {
-        if (data.error) {
-          history.push('/login');
-        } else {
-          this.setState({
-            invoices: data.invoices
+    }).then(resp => {
+      switch(resp.status) {
+        case 200:
+          resp.json().then(({invoices}) => {
+            this.setState({ invoices, hasLoaded: true });
           });
-        }
+          break;
+        case 401:
+          history.push('/login');
+          break;
+        default:
+          console.error('Could not load invoices data', resp);
+          this.setState({
+            modalError: 'Server error, could not load invoices!'
+          });
+      }
+    }).catch(err => {
+      console.error('Communication error', err);
+      this.setState({
+        modalError: 'There was a problem communicating with the server!'
       });
+    });
   }
 
   paidStyle(paid) {
     return paid ? {color: 'rgb(153, 204, 51)'} : {color: 'red'};
   }
 
+  isLoading() {
+    const { modalError, hasLoaded } = this.state;
+    return !modalError && !hasLoaded;
+  }
+
   render() {
-    const paidStyle = this.paidStyle;
     const missing = (msg) => <em>{msg}</em>;
+    const { modalError, invoices, hasLoaded } = this.state;
 
     return (
       <div>
         <h1 className="title">Invoices</h1>
-        <ReactTable data={this.state.invoices}
-          noDataText="No invoice found"
+        <ModalError if={modalError}>
+          <p className="has-text-centered">
+            {modalError}
+          </p>
+          <p className="has-text-centered">
+            <a className="button"
+              onClick={() => window.location.reload()}>Reload page</a>
+          </p>
+        </ModalError>
+        <ReactTable data={invoices}
+          noDataText={hasLoaded ? 'No invoices found' : 'Loading…'}
           columns={[
             { Header: 'ID', accessor: 'invoice_id' },
             { Header: 'Name', accessor: 'entity_name' },
@@ -66,7 +92,7 @@ class InvoiceList extends Component {
             {
               Header: 'Paid?', accessor: 'paid_date',
               Cell: props =>
-                <span style={paidStyle(props.value)}>{
+                <span style={this.paidStyle(props.value)}>{
                   props.value ? 'Yes' : 'No'}</span>,
               filterMethod: (filter, row) => {
                 switch (filter.value) {

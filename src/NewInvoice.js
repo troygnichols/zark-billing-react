@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import { withRouter, Link } from 'react-router-dom';
 import InvoiceForm from './InvoiceForm.js';
 import { getConfig } from './config.js';
 import { buildInvoicePayload } from './lib/util.js';
 import { getAuthToken, getUserProfile } from './lib/auth.js';
+import { toast } from 'react-toastify';
+import ModalError from './ModalError.js';
 
 class NewInvoice extends Component {
 
@@ -16,15 +19,13 @@ class NewInvoice extends Component {
         entity_address: profile.address
       },
     };
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
   }
 
-  handleChange(invoice) {
+  handleChange = (invoice) => {
     this.setState((prevState) => ({...prevState, invoice: invoice}));
-  }
+  };
 
-  handleSubmit(event) {
+  handleSubmit = (event) => {
     event.preventDefault();
     const history = this.props.history;
     fetch(`${getConfig('api.baseUrl')}/invoices/`, {
@@ -35,21 +36,48 @@ class NewInvoice extends Component {
         'Authorization': getAuthToken()
       },
       body: buildInvoicePayload(this.state.invoice)
-    })
-      .then(resp => resp.json())
-      .then(data => {
-        if (data.error) {
+    }).then(resp => {
+      switch(resp.status) {
+        case 201:
+          resp.json().then(({invoice: {id}}) => {
+            toast.success('Successfully created invoice');
+            history.push(`/invoices/${id}`);
+          });
+          break;
+        case 401:
           history.push('/login');
-        } else {
-          history.push(`/invoices/${data.invoice.id}`);
-        }
+          break;
+        case 422:
+          resp.json().then(errors => this.setState({errors}));
+          ReactDOM.findDOMNode(this.refs.top).scrollIntoView();
+          break;
+        default:
+          console.error('Could not load invoice data', resp);
+          this.setState({
+            modalError: 'Server error, could not load invoices!'
+          });
+      }
+    }).catch(err => {
+      console.error('Communication error', err);
+      this.setState({
+        modalError: 'There was a problem communicating with the server!'
       });
-  }
+    });
+  };
 
   render() {
-    const invoice = this.state.invoice;
+    const { invoice, modalError, errors } = this.state;
     return (
-      <div className="container">
+      <div ref="top" className="container">
+        <ModalError if={modalError}>
+          <p className="has-text-centered">
+            {modalError}
+          </p>
+          <p className="has-text-centered">
+            <a className="button"
+              onClick={() => window.location.reload()}>Reload page</a>
+          </p>
+        </ModalError>
         <nav className="breadcrumb">
           <ul>
             <li><Link to="/invoices">Invoices</Link></li>
@@ -58,7 +86,7 @@ class NewInvoice extends Component {
           </ul>
         </nav>
         <InvoiceForm
-          invoice={this.state.invoice}
+          invoice={invoice} errors={errors}
           onChange={this.handleChange} />
 
         <hr/>

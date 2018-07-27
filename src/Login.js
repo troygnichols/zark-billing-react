@@ -4,6 +4,7 @@ import Message from './Message.js';
 import { storeAuthToken, storeUserProfile } from './lib/auth.js';
 import './styles/Login.css';
 import { Link } from 'react-router-dom';
+import ModalError from './ModalError.js';
 
 class Login extends Component {
 
@@ -13,19 +14,11 @@ class Login extends Component {
     this.state = {
       email: '', password: '', loginFailed: false
     };
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleLogin = this.handleLogin.bind(this);
   }
 
-  handleLogin(event) {
+  handleLogin = (event) => {
     event.preventDefault();
-    const self = this;
-    const handleBadCreds = () => {
-      self.setState(prevState => (
-        { ...prevState, password: '', loginFailed: true }
-      ));
-    };
+    const { history } = this.props;
     fetch(`${getConfig('api.baseUrl')}/authenticate`, {
       method: 'POST',
       headers: {
@@ -37,23 +30,35 @@ class Login extends Component {
         password: this.state.password,
         include_profile: true
       })
-    })
-      .then(resp => {
-        if (resp.ok) {
-          return resp.json();
-        }
-        console.error('Server gave bad response to login request', resp);
-        throw new Error('Login failed');
-      })
-      .then(({auth_token, profile}) => {
-        storeAuthToken(auth_token);
-        storeUserProfile(profile);
-        self.props.history.push('/invoices');
-      })
-      .catch(handleBadCreds);
+    }).then(resp => {
+      switch(resp.status) {
+        case 200:
+          resp.json().then(({auth_token, profile}) => {
+            storeAuthToken(auth_token);
+            storeUserProfile(profile);
+            history.push('/invoices');
+          });
+          break;
+        case 401:
+          this.setState(prevState => (
+            {...prevState, password: '', loginFailed: true}
+          ));
+          break;
+        default:
+          console.error('Login attempt failed', resp);
+          this.setState({
+            modalError: 'Server error, login failed! Something went wrong in our system.'
+          });
+      };
+    }).catch(err => {
+      console.error('Communication error', err);
+      this.setState({
+        modalError: 'There was a problem communicating with the server!'
+      });
+    });
   }
 
-  handleChange(event) {
+  handleChange = (event) => {
     event.preventDefault();
     const {target: {name, value}} = event;
     this.setState((prevState) => (
@@ -62,8 +67,18 @@ class Login extends Component {
   }
 
   render() {
+    const { modalError } = this.state;
     return (
       <div className="login-form">
+        <ModalError if={modalError}>
+          <p className="has-text-centered">
+            {modalError}
+          </p>
+          <p className="has-text-centered">
+            <a className="button"
+              onClick={() => window.location.reload()}>Reload page</a>
+          </p>
+        </ModalError>
         <h1 className="title">Login</h1>
         <Message danger if={this.state.loginFailed}>Bad username/password</Message>
         <div className="card">

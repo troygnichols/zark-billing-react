@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
 import { calcAmount, calcTotalAmount } from './lib/util.js';
 import './styles/InvoiceForm.css';
+import Message from './Message.js';
+import { getErrorMessages } from './lib/util.js';
+import InputField from './InputField.js';
+import TextArea from './TextArea.js';
 
 class InvoiceForm extends Component {
-
-  constructor(props) {
-    super(props);
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleAddLineItem = this.handleAddLineItem.bind(this);
-    this.handleDeleteLineItem = this.handleDeleteLineItem.bind(this);
-  }
 
   getOrderedKeys(items) {
     const keys =  Object.keys(items).map((key) => {
@@ -28,7 +24,7 @@ class InvoiceForm extends Component {
     return (parseInt(highestKey, 10) || 0) + 1;
   }
 
-  handleChange(event) {
+  handleChange = (event) => {
     const target = event.target;
     const value = target.type === 'checkbox' ? target.checked : target.value
     const name = target.name;
@@ -50,7 +46,7 @@ class InvoiceForm extends Component {
     this.props.onChange(newInvoice);
   }
 
-  handleDeleteLineItem(event) {
+  handleDeleteLineItem = (event) => {
     event.preventDefault();
     const keyToDel = event.target.getAttribute('data-key');
     const newItems = {};
@@ -65,7 +61,7 @@ class InvoiceForm extends Component {
     this.props.onChange(newInvoice);
   }
 
-  handleAddLineItem(event) {
+  handleAddLineItem = (event) => {
     event.preventDefault();
     const prevInvoice = this.props.invoice;
     const newKey = this.getNextLineItemKey(prevInvoice.items);
@@ -77,81 +73,53 @@ class InvoiceForm extends Component {
   }
 
   render() {
-    const invoice = this.props.invoice;
+    const { invoice, errors={} } = this.props;
+    const errMsgs = getErrorMessages(errors);
     return (
       <form>
+        <Message danger if={errMsgs.length}>
+          {errMsgs.map((msg, i) => (
+            <div key={i}>{msg}</div>
+          ))}
+        </Message>
         <div className="columns">
           <div className="column is-half">
-            <div className="field">
-              <label className="label">Your Business</label>
-              <div className="control">
-                <input type="text" name="entity_name" required autoFocus
-                  placeholder="Foobar LLC" className="input"
-                  value={invoice.entity_name || ''}
-                  onChange={this.handleChange} />
-              </div>
-            </div>
-            <div className="field">
-              <label className="label">Your Business Address</label>
-              <div className="control">
-                <textarea className="textarea"
-                  name="entity_address" value={invoice.entity_address || ''}
-                  onChange={this.handleChange} rows="2" />
-              </div>
-            </div>
-            <div className="field">
-              <label className="label">Your Client</label>
-              <input type="text" name="client_name" required
-                placeholder="Bankcorp" className="input"
-                value={invoice.client_name || ''}
-                onChange={this.handleChange} />
-            </div>
-            <div className="field">
-              <label className="label">Invoice ID</label>
-              <div className="control">
-                <input type="text" name="invoice_id" required
-                  value={invoice.invoice_id || ''} className="input"
-                  onChange={this.handleChange} />
-              </div>
-            </div>
-            <div className="field">
-              <label className="label">Date Issued</label>
-              <input type="date" name="issue_date" required
-                value={invoice.issue_date || ''} className="input"
-                onChange={this.handleChange} />
-            </div>
-            <div className="field">
-              <label className="label">Due Date</label>
-              <div className="control">
-                <input type="date" name="due_date" required
-                  value={invoice.due_date || ''} className="input"
-                  onChange={this.handleChange} />
-              </div>
-            </div>
-            <div className="field">
-              <label className="label">Paid Date</label>
-              <div className="control">
-                <input type="date" name="paid_date"
-                  value={invoice.paid_date || ''} className="input"
-                  onChange={this.handleChange} />
-              </div>
-            </div>
-            <div className="field">
-              <label className="label">Subject</label>
-              <div className="control">
-                <input type="text" name="subject" required
-                  value={invoice.subject || ''} className="input"
-                  onChange={this.handleChange} />
-              </div>
-            </div>
-            <div className="field">
-              <label className="label">Notes</label>
-              <div className="control">
-                <textarea name="notes" value={invoice.notes || ''}
-                  className="textarea" onChange={this.handleChange}
-                  rows="4" />
-              </div>
-            </div>
+            <InputField
+              label="Your Business" name="entity_name"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} />
+            <TextArea
+              label="Your Business Address" name="entity_address"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} rows="2" />
+            <InputField
+              label="Your Client" name="client_name"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} />
+            <InputField
+              label="Invoice ID" name="invoice_id"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} />
+            <InputField
+              label="Subject" name="subject"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} />
+            <TextArea
+              label="Notes" name="notes"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} rows="2" />
+            <InputField type="date"
+              label="Date Issued" name="issue_date"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} />
+            <InputField type="date"
+              label="Due Date" name="due_date"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} />
+            <InputField type="date"
+              label="Paid Date" name="paid_date"
+              object={invoice} errors={errors}
+              onChange={this.handleChange} />
           </div>
         </div>
         <div className="field">
@@ -178,7 +146,7 @@ class InvoiceForm extends Component {
                           onChange={this.handleChange} />
                       </div>
                       <div className="column is-2">
-                        <input type="text" name={`items.quantity.${key}`}
+                        <input type="number" name={`items.quantity.${key}`}
                           required value={item.quantity || 0}
                           className="input" onChange={this.handleChange} />
                       </div>

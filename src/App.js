@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import './styles/bulma/bulma.cyborg-theme.css';
+import './styles/bulma/bulma.custom.css';
 import './styles/App.css';
 
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
@@ -27,14 +28,13 @@ class App extends Component {
           <div className="section">
             <div className="container">
               <ToastContainer position={toast.POSITION.TOP_RIGHT}
+                className="toast-message"
                 hideProgressBar={true}
                 draggable
                 autoClose={5000}
                 newestOnTop={false}
                 closeOnClick={false}
-                rtl={false}
                 pauseOnVisibilityChange={false}
-                toastClassName="dark-toast"
                 transition={Zoom} />
               <Switch>
                 <Redirect exact from='/' to='/invoices' />

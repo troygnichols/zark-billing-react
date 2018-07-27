@@ -1,0 +1,7 @@
+.modal-error .modal-card-body {
+  background-color: #ff3860;
+}
+
+.modal-error .modal-card-body > p {
+  margin: 1em;
+}
