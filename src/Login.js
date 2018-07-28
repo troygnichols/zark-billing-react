@@ -5,6 +5,7 @@ import { storeAuthToken, storeUserProfile } from './lib/auth.js';
 import './styles/Login.css';
 import { Link } from 'react-router-dom';
 import ModalError from './ModalError.js';
+import InputField from './InputField.js';
 
 class Login extends Component {
 
@@ -84,19 +85,10 @@ class Login extends Component {
         <div className="card">
           <div className="card-content">
             <form onSubmit={this.handleLogin}>
-              <div className="field">
-                <label className="label">Email</label>
-                <div className="control">
-                  <input className="input" autoFocus type="text" name="email"
-                    value={this.state.email} onChange={this.handleChange}/>
-                </div>
-              </div>
-              <div className="field">
-                <label className="label">Password</label>
-                <input type="password" name="password"
-                  value={this.state.password} onChange={this.handleChange}
-                  className="input"/>
-              </div>
+              <InputField label="Email" name="email" object={this.state}
+                onChange={this.handleChange} />
+              <InputField label="Password" type="password" name="password"
+                object={this.state} onChange={this.handleChange} />
               <div className="is-clearfix">
                 <Link to="reset_password" className="is-pulled-left">Forgot password</Link>
                 <div className="control">
