@@ -89,7 +89,6 @@ class NewInvoice extends Component {
         <nav className="breadcrumb">
           <ul>
             <li><Link to="/invoices">Invoices</Link></li>
-            <li><Link to={`/invoices/${invoice.id}`}>Invoice {invoice.invoice_id}</Link></li>
             <li className="is-active"><a href="#new">New Invoice</a></li>
           </ul>
         </nav>
