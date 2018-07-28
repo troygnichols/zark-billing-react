@@ -7,6 +7,7 @@ import { buildInvoicePayload } from './lib/util.js';
 import { getAuthToken, getUserProfile, isLoggedIn } from './lib/auth.js';
 import { toast } from 'react-toastify';
 import ModalError from './ModalError.js';
+import ButtonControls from './ButtonControls.js';
 
 class NewInvoice extends Component {
 
@@ -97,15 +98,11 @@ class NewInvoice extends Component {
           onChange={this.handleChange} />
 
         <hr/>
-        <div className="field is-grouped">
-          <div className="control">
-            <a href="#save" className="button is-link"
-              onClick={this.handleSubmit}>Save</a>
-          </div>
-          <div className="control">
-            <Link to="/invoices" className="cancel button">Cancel</Link>
-          </div>
-        </div>
+        <ButtonControls>
+          <Link to="/invoices" className="cancel button">Cancel</Link>
+          <a href="#save" className="button is-link has-text-weight-bold"
+            onClick={this.handleSubmit}>Save</a>
+        </ButtonControls>
       </div>
     );
   }

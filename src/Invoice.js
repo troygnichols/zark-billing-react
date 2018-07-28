@@ -10,6 +10,7 @@ import ModalConfirm from './ModalConfirm.js';
 import ModalLoading from './ModalLoading.js';
 import ModalError from './ModalError.js';
 import { toast } from 'react-toastify';
+import ButtonControls from './ButtonControls.js';
 
 class Invoice extends Component {
 
@@ -240,18 +241,16 @@ class Invoice extends Component {
         </div>
 
         <hr/>
-        <div className="field is-grouped is-pulled-left">
-          <p className="control">
+        <div className="is-pulled-left">
+          <ButtonControls className="is-pulled-left">
             <Link to={`/invoices/${invoice.id}/edit`}
               className="button">Edit Invoice</Link>
-          </p>
-          <p className="control">
-          <button onClick={this.handleGeneratePdf}
-            className="button is-primary">Generate PDF</button>
-          </p>
+            <button onClick={this.handleGeneratePdf}
+              className="button is-primary">Generate PDF</button>
+          </ButtonControls>
         </div>
-          <button onClick={this.handleDeleteInvoice}
-            className="is-pulled-right button is-danger">
+        <button onClick={this.handleDeleteInvoice}
+          className="is-pulled-right button is-danger">
             <i className="delete"></i>&nbsp;Delete Invoice</button>
       </div>
     );

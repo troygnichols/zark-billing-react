@@ -9,6 +9,7 @@ import { getAuthToken } from './lib/auth.js';
 import { toast } from 'react-toastify';
 import ModalLoading from './ModalLoading.js';
 import ModalError from './ModalError.js';
+import ButtonControls from './ButtonControls.js';
 
 class EditInvoice extends Component {
 
@@ -152,14 +153,10 @@ class EditInvoice extends Component {
           invoice={invoice} errors={errors}
           onChange={this.handleChange} />
         <hr/>
-        <div className="field is-grouped">
-          <p className="control">
-            <a href="#save" className="is-link button" onClick={this.handleSubmit}>Save</a>
-          </p>
-          <p className="control">
-            <Link to={`/invoices/${invoice.id}`} className="cancel button">Cancel</Link>
-          </p>
-        </div>
+        <ButtonControls>
+          <Link to={`/invoices/${invoice.id}`} className="cancel button">Cancel</Link>
+          <a href="#save" className="is-link button has-text-weight-bold" onClick={this.handleSubmit}>Save</a>
+        </ButtonControls>
       </div>
     );
   }

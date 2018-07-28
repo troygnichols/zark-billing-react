@@ -6,6 +6,7 @@ import Message from './Message.js';
 import { toast } from 'react-toastify';
 import { getErrorMessages } from './lib/util.js';
 import ModalError from './ModalError.js';
+import ButtonControls from './ButtonControls.js';
 
 class ChangePassword extends Component {
 
@@ -114,18 +115,12 @@ class ChangePassword extends Component {
                     onChange={this.handleChange}/>
                 </div>
               </div>
-              <div className="is-clearfix">
-                <div className="field is-grouped is-pulled-right">
-                  <div className="control">
-                    <Link to="/profile" className="button">Cancel</Link>
-                  </div>
-                  <div className="control">
-                    <button type="submit"
-                      className="button is-link has-text-weight-bold">
-                      Save</button>
-                  </div>
-                </div>
-              </div>
+              <ButtonControls className="is-pulled-right">
+                <Link to="/profile" className="button">Cancel</Link>
+                <button type="submit"
+                  className="button is-link has-text-weight-bold">
+                  Save</button>
+              </ButtonControls>
             </div>
           </div>
         </form>
