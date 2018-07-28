@@ -7,3 +7,4 @@
 - make footer stick to bottom
 - signup???
 - reset password
+- "Logging in" modal cuz sometimes backend dyno asleep, confusing UI otherwise

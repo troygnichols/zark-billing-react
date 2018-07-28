@@ -1,4 +1,16 @@
 .login-form {
-  max-width: 360px;
+  max-width: 400px;
   margin: 0 auto;
+}
+
+.login-form .create-account {
+  text-align: center;
+}
+
+.login-form .divider {
+  margin-bottom: 1em;
+}
+
+.login-form .create-account .spacer {
+  margin-bottom: .8em;
 }
