@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class InputField extends Component {
   render() {
     const {
-      name, object, errors, label, type='text',
+      name, object, label, errors={}, type='text',
       ...rest
     } = this.props;
 
