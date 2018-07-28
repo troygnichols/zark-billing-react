@@ -5,8 +5,8 @@ import { getAuthToken } from './lib/auth.js';
 import Message from './Message.js';
 import { toast } from 'react-toastify';
 import { getErrorMessages } from './lib/util.js';
-import ModalError from './ModalError.js';
 import ButtonControls from './ButtonControls.js';
+import { withErrors } from './ErrorProvider.js';
 
 class ChangePassword extends Component {
 
@@ -32,7 +32,7 @@ class ChangePassword extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { history } = this.props;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/update_password`, {
       method: 'PATCH',
       headers: {
@@ -55,35 +55,22 @@ class ChangePassword extends Component {
           break;
         default:
           console.error('Update password failed', resp);
-          this.setState({
-            modalError: 'Server error, could not update password!'
-          });
+          globalError('Server error, could not update password!');
       }
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError('There was a problem communicating with the server!');
     });
   };
 
   render() {
     const {
-      errors, modalError, password, password_confirmation
+      errors, password, password_confirmation
     } = this.state;
     const errMsgs = getErrorMessages(errors);
 
     return (
       <div>
-        <ModalError if={modalError}>
-          <p className="has-text-centered">
-            {modalError}
-          </p>
-          <p className="has-text-centered">
-            <a className="button"
-              onClick={() => window.location.reload()}>Reload page</a>
-          </p>
-        </ModalError>
         <nav className="breadcrumb">
           <ul>
             <li><Link to="/">Home</Link></li>
@@ -129,5 +116,4 @@ class ChangePassword extends Component {
   }
 }
 
-export default ChangePassword;
-
+export default withErrors(ChangePassword);

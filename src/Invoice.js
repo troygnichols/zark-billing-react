@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { createInvoice } from './lib/pdf.js';
 import blobStream from 'blob-stream';
 import { calcAmount, calcTotalAmount } from './lib/util.js';
@@ -8,9 +8,9 @@ import { getConfig } from './config.js';
 import { getAuthToken } from './lib/auth.js';
 import ModalConfirm from './ModalConfirm.js';
 import ModalLoading from './ModalLoading.js';
-import ModalError from './ModalError.js';
 import { toast } from 'react-toastify';
 import ButtonControls from './ButtonControls.js';
+import { withErrors } from './ErrorProvider.js';
 
 class Invoice extends Component {
 
@@ -26,7 +26,7 @@ class Invoice extends Component {
 
   componentDidMount() {
     const id = this.props.match.params.id;
-    const history = this.props.history;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
       method: 'GET',
       headers: {
@@ -46,15 +46,17 @@ class Invoice extends Component {
           break;
         default:
           console.error('Could not load invoices data', resp);
-          this.setState({
-            modalError: 'Server error, could not load invoices!'
-          });
+          globalError(
+            'Server error, could not load invoices!', () =>
+            history.push('/login'))
       }
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError(
+        'There was a problem communicating with the server!',
+        history.push('/'));
+    }).finally(() => {
+      this.setState(prev => ({...prev, hasLoaded: true}));
     });
   }
 
@@ -78,7 +80,7 @@ class Invoice extends Component {
 
   commitDelete() {
     const { id } = this.state.invoice;
-    const { history } = this.props;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
       method: 'DELETE',
       headers: {
@@ -99,30 +101,16 @@ class Invoice extends Component {
           break;
         default:
           console.error('Delete invoice failed', resp);
-          this.setState({
-            modalError: 'Server error, could not delete invoice!'
-          });
+          globalError('Server error, could not delete invoice!');
       }
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError('There was a problem communicating with the server!');
     });
   }
 
-  isLoading() {
-    const { modalError, hasLoaded } = this.state;
-    return !modalError && !hasLoaded;
-  }
-
-  showConfirmDeleteModal() {
-    const { modalError, showConfirmDeleteModal } = this.state;
-    return !modalError && showConfirmDeleteModal;
-  }
-
   render() {
-    const { invoice, modalError } = this.state
+    const { invoice, showConfirmDeleteModal, hasLoaded } = this.state
 
     const totalStyle = {
       backgroundColor: '#99CC33', color: '#000', fontSize: '120%'
@@ -130,17 +118,8 @@ class Invoice extends Component {
 
     return (
       <div>
-        <ModalError if={modalError}>
-          <p className="has-text-centered">
-            {modalError}
-          </p>
-          <p className="has-text-centered">
-            <a className="button"
-              onClick={() => window.location.reload()}>Reload page</a>
-          </p>
-        </ModalError>
-        <ModalLoading if={this.isLoading()} />
-        <ModalConfirm if={this.showConfirmDeleteModal()}
+        <ModalLoading if={!hasLoaded} />
+        <ModalConfirm if={showConfirmDeleteModal}
           title="Confirm Delete" confirmText="Yes, delete it"
           onConfirm={this.commitDelete}
           onCancel={() => {
@@ -257,4 +236,4 @@ class Invoice extends Component {
   }
 }
 
-export default withRouter(Invoice);
+export default withErrors(Invoice);

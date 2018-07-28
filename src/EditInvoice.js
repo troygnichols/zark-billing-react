@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { withRouter, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { buildInvoicePayload } from './lib/util.js';
 import { getConfig } from './config.js';
 import difference from 'lodash.difference';
@@ -8,8 +8,8 @@ import InvoiceForm from './InvoiceForm.js';
 import { getAuthToken } from './lib/auth.js';
 import { toast } from 'react-toastify';
 import ModalLoading from './ModalLoading.js';
-import ModalError from './ModalError.js';
 import ButtonControls from './ButtonControls.js';
+import { withErrors } from './ErrorProvider.js';
 
 class EditInvoice extends Component {
 
@@ -35,7 +35,7 @@ class EditInvoice extends Component {
 
   componentDidMount() {
     const id = this.props.match.params.id;
-    const history = this.props.history;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/invoices/${id}`, {
       method: 'GET',
       headers: {
@@ -58,15 +58,15 @@ class EditInvoice extends Component {
           break;
         default:
           console.error('Could not load invoice data', resp);
-          this.setState({
-            modalError: 'Server error, could not load invoices!'
-          });
+          globalError('Server error, could not load invoice!', () =>
+            history.push('/'));
       }
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError('There was a problem communicating with the server!', () =>
+        history.push('/'));
+    }).finally(() => {
+      this.setState(prev => ({...prev, hasLoaded: true}));
     });
   }
 
@@ -76,7 +76,7 @@ class EditInvoice extends Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const { history }  = this.props;
+    const { history, error: globalError }  = this.props;
     const { invoice } = this.state;
     const idsToDel = this.findIdsToDel();
     fetch(`${getConfig('api.baseUrl')}/invoices/${invoice.id}`, {
@@ -104,15 +104,11 @@ class EditInvoice extends Component {
           break;
         default:
           console.error('Save invoice failed', resp);
-          this.setState({
-            modalError: 'Server error, could not update invoice!'
-          });
+          globalError('Server error, could not update invoice!');
       };
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError('There was a problem communicating with the server!');
     });
   }
 
@@ -122,25 +118,11 @@ class EditInvoice extends Component {
     return difference(this.state.originalItemIds, newItemIds);
   }
 
-  isLoading() {
-    const { modalError, hasLoaded } = this.state;
-    return !modalError && !hasLoaded;
-  }
-
   render() {
-    const { modalError, invoice, errors } = this.state;
+    const { hasLoaded, invoice, errors } = this.state;
     return (
       <div ref="top" className="container">
-        <ModalError if={modalError}>
-          <p className="has-text-centered">
-            {modalError}
-          </p>
-          <p className="has-text-centered">
-            <a className="button"
-              onClick={() => window.location.reload()}>Reload page</a>
-          </p>
-        </ModalError>
-        <ModalLoading if={this.isLoading()} />
+        <ModalLoading if={!hasLoaded} />
         <nav className="breadcrumb">
           <ul>
             <li><Link to="/invoices">Invoices</Link></li>
@@ -162,4 +144,4 @@ class EditInvoice extends Component {
   }
 }
 
-export default withRouter(EditInvoice);
+export default withErrors(EditInvoice);

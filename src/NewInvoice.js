@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { withRouter, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import InvoiceForm from './InvoiceForm.js';
 import { getConfig } from './config.js';
 import { buildInvoicePayload } from './lib/util.js';
 import { getAuthToken, getUserProfile, isLoggedIn } from './lib/auth.js';
 import { toast } from 'react-toastify';
-import ModalError from './ModalError.js';
 import ButtonControls from './ButtonControls.js';
+import { withErrors } from './ErrorProvider.js';
 
 class NewInvoice extends Component {
 
@@ -35,7 +35,7 @@ class NewInvoice extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const history = this.props.history;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/invoices/`, {
       method: 'POST',
       headers: {
@@ -61,31 +61,18 @@ class NewInvoice extends Component {
           break;
         default:
           console.error('Could not load invoice data', resp);
-          this.setState({
-            modalError: 'Server error, could not load invoices!'
-          });
+          globalError('Server error, could not load invoices!');
       }
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError('There was a problem communicating with the server!');
     });
   };
 
   render() {
-    const { invoice, modalError, errors } = this.state;
+    const { invoice, errors } = this.state;
     return (
       <div ref="top" className="container">
-        <ModalError if={modalError}>
-          <p className="has-text-centered">
-            {modalError}
-          </p>
-          <p className="has-text-centered">
-            <a className="button"
-              onClick={() => window.location.reload()}>Reload page</a>
-          </p>
-        </ModalError>
         <nav className="breadcrumb">
           <ul>
             <li><Link to="/invoices">Invoices</Link></li>
@@ -107,4 +94,4 @@ class NewInvoice extends Component {
   }
 }
 
-export default withRouter(NewInvoice);
+export default withErrors(NewInvoice);

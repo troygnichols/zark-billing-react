@@ -4,8 +4,8 @@ import Message from './Message.js';
 import { storeAuthToken, storeUserProfile } from './lib/auth.js';
 import './styles/Login.css';
 import { Link } from 'react-router-dom';
-import ModalError from './ModalError.js';
 import InputField from './InputField.js';
+import { withErrors } from './ErrorProvider.js';
 
 class Login extends Component {
 
@@ -19,7 +19,7 @@ class Login extends Component {
 
   handleLogin = (event) => {
     event.preventDefault();
-    const { history } = this.props;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/authenticate`, {
       method: 'POST',
       headers: {
@@ -47,15 +47,14 @@ class Login extends Component {
           break;
         default:
           console.error('Login attempt failed', resp);
-          this.setState({
-            modalError: 'Server error, login failed! Something went wrong in our system.'
-          });
+          globalError(
+            'Server error, login failed! Something went wrong ' +
+            'in our system.');
       };
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError(
+        'There was a problem communicating with the server!');
     });
   }
 
@@ -68,18 +67,8 @@ class Login extends Component {
   }
 
   render() {
-    const { modalError } = this.state;
     return (
       <div className="login-form">
-        <ModalError if={modalError}>
-          <p className="has-text-centered">
-            {modalError}
-          </p>
-          <p className="has-text-centered">
-            <a className="button"
-              onClick={() => window.location.reload()}>Reload page</a>
-          </p>
-        </ModalError>
         <h1 className="title">Login</h1>
         <Message danger if={this.state.loginFailed}>Bad username/password</Message>
         <div className="card">
@@ -98,6 +87,11 @@ class Login extends Component {
                 </div>
               </div>
             </form>
+            <hr className="divider"/>
+            <div className="create-account">
+              <div className="spacer">&#8212; or &#8212;</div>
+              <Link to="/signup" className="button is-success">Create Account</Link>
+            </div>
           </div>
         </div>
       </div>
@@ -105,4 +99,4 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default withErrors(Login);

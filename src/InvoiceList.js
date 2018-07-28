@@ -7,7 +7,7 @@ import 'react-table/react-table.css';
 import './styles/InvoiceList.css';
 import SimpleTable from './SimpleTable.js';
 import { calcAmount, calcTotalAmount } from './lib/util.js';
-import ModalError from './ModalError.js';
+import { withErrors } from './ErrorProvider.js';
 
 class InvoiceList extends Component {
   constructor() {
@@ -24,7 +24,7 @@ class InvoiceList extends Component {
   }
 
   componentDidMount() {
-    const history = this.props.history;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/invoices`, {
       method: 'GET',
       headers: {
@@ -44,15 +44,13 @@ class InvoiceList extends Component {
           break;
         default:
           console.error('Could not load invoices data', resp);
-          this.setState({
-            modalError: 'Server error, could not load invoices!'
-          });
+          globalError('Server error, could not load invoices!', () =>
+            history.push('/'));
       }
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError('There was a problem communicating with the server!', () =>
+        history.push('/login'));
     });
   }
 
@@ -60,27 +58,13 @@ class InvoiceList extends Component {
     return paid ? {color: 'rgb(153, 204, 51)'} : {color: 'red'};
   }
 
-  isLoading() {
-    const { modalError, hasLoaded } = this.state;
-    return !modalError && !hasLoaded;
-  }
-
   render() {
     const missing = (msg) => <em>{msg}</em>;
-    const { modalError, invoices, hasLoaded } = this.state;
+    const { invoices, hasLoaded } = this.state;
 
     return (
       <div>
         <h1 className="title">Invoices</h1>
-        <ModalError if={modalError}>
-          <p className="has-text-centered">
-            {modalError}
-          </p>
-          <p className="has-text-centered">
-            <a className="button"
-              onClick={() => window.location.reload()}>Reload page</a>
-          </p>
-        </ModalError>
         <ReactTable data={invoices}
           noDataText={hasLoaded ? 'No invoices found' : 'Loading…'}
           columns={[
@@ -162,4 +146,4 @@ class InvoiceList extends Component {
   }
 }
 
-export default InvoiceList;
+export default withErrors(InvoiceList);

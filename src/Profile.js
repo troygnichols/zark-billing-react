@@ -4,10 +4,10 @@ import './styles/Profile.css';
 import { getConfig } from './config.js';
 import { getAuthToken, storeUserProfile } from './lib/auth.js';
 import { toast } from 'react-toastify';
-import ModalError from './ModalError.js';
 import ModalLoading from './ModalLoading.js';
 import Message from './Message.js';
 import { getErrorMessages } from './lib/util.js';
+import { withErrors } from './ErrorProvider.js';
 
 class Profile extends Component {
 
@@ -19,7 +19,7 @@ class Profile extends Component {
   }
 
   componentDidMount() {
-    const history = this.props.history;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/profile`, {
       method: 'GET',
       headers: {
@@ -38,15 +38,15 @@ class Profile extends Component {
           break;
         default:
           console.error('Could not load profile data', resp);
-          this.setState({ modalError:
-            'Server error, could not load profile!' });
+          globalError('Server error, could not load profile!', () =>
+            history.push('/'));
       }
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
-    })
+      globalError('There was a problem communicating with the server!');
+    }).finally(() => {
+      this.setState(prev => ({...prev, hasLoaded: true}));
+    });
   }
 
   handleChange = (event) => {
@@ -59,7 +59,7 @@ class Profile extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const { history } = this.props;
+    const { history, error: globalError } = this.props;
     fetch(`${getConfig('api.baseUrl')}/profile`, {
       method: 'PATCH',
       headers: {
@@ -85,45 +85,28 @@ class Profile extends Component {
           break;
         default:
           console.error('Save profile failed', resp);
-          this.setState({
-            modalError: 'Server error, could not save profile!'
-          });
+          globalError('Server error, could not save profile!');
       }
     }).catch(err => {
       console.error('Communication error', err);
-      this.setState({
-        modalError: 'There was a problem communicating with the server!'
-      });
+      globalError(
+        'There was a problem communicating with the server!');
     });
   }
 
-  isLoading() {
-    const { modalError, hasLoaded } = this.state;
-    return !modalError && !hasLoaded;
-  }
-
   render() {
-    const { profile, modalError, errors } = this.state;
+    const { profile, errors, hasLoaded } = this.state;
     const errMsgs = getErrorMessages(errors);
 
     return (
       <div>
-        <ModalLoading if={this.isLoading()} />
+        <ModalLoading if={!hasLoaded} />
         <nav className="breadcrumb">
           <ul>
             <li><Link to="/">Home</Link></li>
             <li className="is-active"><a href="#profile">Edit Profile</a></li>
           </ul>
         </nav>
-        <ModalError if={modalError}>
-          <p className="has-text-centered">
-            {modalError}
-          </p>
-          <p className="has-text-centered">
-            <a className="button"
-              onClick={() => window.location.reload()}>Reload page</a>
-          </p>
-        </ModalError>
         <Message danger if={errMsgs.length}>
           {errMsgs.map((msg, i) => (
             <div key={i}>{msg}</div>
@@ -175,4 +158,4 @@ class Profile extends Component {
   }
 }
 
-export default Profile;
+export default withErrors(Profile);
