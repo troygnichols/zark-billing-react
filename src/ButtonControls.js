@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './styles/ButtonControls.css';
 
 class ButtonControls extends Component {
   render() {
