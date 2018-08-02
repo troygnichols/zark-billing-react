@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 class TextArea extends Component {
   render() {
     const {
-      name, object, errors, label,
+      name, object, label, errors={},
       ...rest
     } = this.props;
 

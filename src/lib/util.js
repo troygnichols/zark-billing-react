@@ -1,6 +1,8 @@
 import titleize from 'titleize';
 import { humanize } from 'inflection';
 
+const EMAIL_KEY = 'zark-billing-email';
+
 export function calcAmount(item) {
   const amt = parseInt(item.quantity, 10) * parseInt(item.unit_price, 10);
   return amt || 0;
@@ -11,6 +13,18 @@ export function calcTotalAmount(invoice) {
   return (invoice.items||[]).reduce((acc, item) => (
     acc + calcAmount(item)
   ), 0);
+}
+
+export function storeEmail(email) {
+  sessionStorage.setItem(EMAIL_KEY, email);
+}
+
+export function getStoredEmail() {
+  return sessionStorage.getItem(EMAIL_KEY);
+}
+
+export function clearStoredEmail() {
+  sessionStorage.removeItem(EMAIL_KEY);
 }
 
 export function buildInvoicePayload(invoice, itemIdsToDelete) {

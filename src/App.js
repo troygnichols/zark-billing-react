@@ -17,6 +17,7 @@ import NavBar from './NavBar.js';
 import { Zoom, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Signup from './Signup.js';
+import SignupSuccess from './SignupSuccess.js';
 import ModalError from './ModalError';
 import { ErrorProvider } from './ErrorProvider.js';
 
@@ -79,6 +80,7 @@ class App extends Component {
                   <Redirect exact from='/' to='/invoices' />
                   <Route exact path='/login' component={Login} />
                   <Route exact path='/signup' component={Signup} />
+                  <Route exact path='/signup/success' component={SignupSuccess} />
                   <Route exact path='/profile' component={Profile} />
                   <Route exact path='/change_password' component={ChangePassword} />
                   <Route exact path='/invoices' component={InvoiceList} />
