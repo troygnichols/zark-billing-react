@@ -82,7 +82,7 @@ class Signup extends Component {
           <div className="card">
             <div className="card-content">
               <form onSubmit={this.handleSubmit}>
-                <InputField autoFocus label="Email" name="email"
+                <InputField autoFocus label="Email" name="email" type="email"
                   errors={errors} object={signup} onChange={this.handleChange} />
                 <InputField label="Name" name="name"
                   errors={errors} object={signup} onChange={this.handleChange} />
