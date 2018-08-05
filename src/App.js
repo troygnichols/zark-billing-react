@@ -20,6 +20,10 @@ import Signup from './Signup.js';
 import SignupSuccess from './SignupSuccess.js';
 import ModalError from './ModalError';
 import { ErrorProvider } from './ErrorProvider.js';
+import ResetPassword from './ResetPassword.js';
+import ResetPasswordSent from './ResetPasswordSent.js';
+import ResetPasswordEdit from './ResetPasswordEdit.js';
+import ResetPasswordExpired from './ResetPasswordExpired.js';
 
 class App extends Component {
 
@@ -80,6 +84,10 @@ class App extends Component {
                   <Switch>
                     <Redirect exact from='/' to='/invoices' />
                     <Route exact path='/login' component={Login} />
+                    <Route exact path='/reset_password' component={ResetPassword} />
+                    <Route exact path='/reset_password/sent' component={ResetPasswordSent} />
+                    <Route exact path='/reset_password/edit' component={ResetPasswordEdit} />
+                    <Route exact path='/reset_password/expired' component={ResetPasswordExpired} />
                     <Route exact path='/signup' component={Signup} />
                     <Route exact path='/signup/success' component={SignupSuccess} />
                     <Route exact path='/profile' component={Profile} />
